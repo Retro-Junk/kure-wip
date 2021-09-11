@@ -1,0 +1,33 @@
+PXI Decompression algorithm
+
+Compressed data is made of multitude of variable-sized blocks. Each block is independed of each other. Special flag is passed in block's header
+to signify that more blocks to follow (otherwise, this is the last block and after its decoding the whole decompression process is done.)
+
+Each block starts with the following header:
+  byte  dict_size     - number of dictionary entries
+  byte  not_last      - if 0 - this is the last block of compressed data
+  word  data_size     - block's (compressed) data size, little-endian
+
+If dict_size is 0, then this block is not compressed and plain data of data_size follows the header:
+  byte   plain_data[data_size]
+
+If dict_size is not 0, then the block is compressed. Header continues with 3 dictionary initialization sets and the compressed data:
+  byte   codes_init[dict_size]
+  byte   prefx_init[dict_size]
+  byte   suffx_init[dict_size]
+  byte   compr_data[data_size]
+
+Init arrays are used to initialize up to dict_size (1-255) entries of corresponding dictionary, starting from entry 1.
+The dictionary's index 0 is used as a terminal marker.
+
+The compression itself is a LZ78 variant. It works pretty much like standard LZ78, except that it uses static dictionary and a special way of
+encoding of (parent, suffix) pairs, that forms compressed data stream.
+
+Codes dictionary maps compressed stream byte to prefix/suffix dictionary entries.
+Prefix dictionary forms linked list of prefix codes.
+Suffix dictionary similarly forms list of suffix codes.
+
+For each compressed byte, if its a prefix/suffix (i.e. it has a non-zero entry in the Codes dictionary) prefixes list is traversed to build
+prefix string, then suffixes traversed in similar way to make suffix string. Combined, they produce decompressed data. If compressed byte is
+not a code, it's copied verbatim. Prefixes/suffixes may form recursive chains that must be unrolled.
+

@@ -1,0 +1,62 @@
+Script Interpreter specification
+
+Game uses simple scripting system, that runs binary scripts. The script language is very limited and essentially only allows to 
+modify/examine game state variables and invoke various game engine routines with specified parameters. The only other supported
+features are (un)conditional branching and subroutines.
+
+Interpreter takes single argument - command. 
+Command format:
+  0000 - end (exit interpreter)
+  9xxx - draw message box with text id xxx
+  Axxx - execute command xxx
+  Bxxx - execute command xxx
+  0xxx - execute script at offset xxx
+  1xxx,
+  2xxx,
+  3xxx,
+  4xxx,
+  5xxx,
+  6xxx,
+  7xxx,
+  8xxx,
+  Cxxx,
+  Dxxx,
+  Exxx - execute script xxx
+  Fxxx - execute script xxx, but reset callstack first
+
+For commands Axxx and Bxxx, a simple command handler invocation is done, then interpreter finishes.
+
+Command 9xxx invokes message box with string index xxx & 0x3FF from desc bank.
+
+Command 0xxx begins execution of a script at direct offset xxx & 0x3FF in the script code.
+
+The remaining commands begin execution of a script in block with index xxx & 0x3FF.
+
+Script execution is performed in a simple loop:
+
+while (script_ofs != script_end)
+{
+   handler = script_code[script_ofs]
+   if (handler == 0 || handler > max_opcode)
+     break
+   dispatchers[handler]()
+}
+
+Each dispatcher may fetch extra arguments from the script bytecode then advance script_ofs as needed.
+
+Script commands listed below may pivot script_ofs to another part of script code.
+Cond  - evaluate a condition based on provided expression, if it's true (non-zero) execute next opcodes,
+        otherwise jump to specified address. Used to implement IF-THEN-ELSE logic.
+Chain - end current routine and jump to another routine (by its index).
+Jump  - jump to specified offset within bytecode, normally in the current routine. Jump past routine end
+        is often used to stop the routine execution.
+Call  - call another subroutine at specified offset, then continue current routine execution.
+        A subroutine must explicitly use Ret opcode in order to properly return execution to the caller.
+Ret   - return from a subroutine
+
+
+Command Fxxx resets script call chain to initially saved state. The real call chain, not the one used by internal
+call/ret dispatchers. May be used to abort all upper-level routines? Doesn't seem to be used in actual game scripts.
+
+Re-entering the interpreter for script execution is not directly supported due to global script_ofs/script_end variables,
+but can be done (and is performed by some commands) by preserving/restoring said variables manually.

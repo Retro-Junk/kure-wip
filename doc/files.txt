@@ -1,0 +1,69 @@
+Game files for PC/CGA version. Some files are embedded into the main executable.
+
+Executables:
+
+ERE.BAT      - game start script (invokes fast launcher)
+SCORPION.EXE - video card selection program
+IRUN.COM     - fast launcher (written in some high-level language?)
+ERE.COM      - normal launcher and configuration program (launcher function seems to be broken due to wrong module name in the config?)
+CONFIG.TAT   - configuration file for the launcher
+ERE.PXI      - main game executable bundle (compressed)
+               file #0 - CGA executable
+               file #1 - Hercules executable
+
+Fullscreens:
+
+PRES.BIN     - title screen, compressed
+DRAP.BIN     - language selection screen, compressed
+FOND.BIN     - main background screen, compressed
+
+
+Sprite banks:
+
+SPRIT.BIN    - common sprites (inventory objects, etc.)
+PULLZ.BIN    - room sprites
+PERS1.BIN    - portraits / character sprites
+PERS2.BIN    - -//-
+
+
+Animations:
+
+ANICO.BIN    - portraits animation sequences
+
+
+Misc graphics:
+
+CARPC.BIN    - font glyphs
+SOURI.BIN    - mouse cursors shapes
+GAUSS.BIN    - gauss animation sprites and background tile
+
+
+Rooms:
+
+ARPLA.BIN    - rooms decoration descriptions
+ZONES.BIN    - rooms hotspots/objects descriptions
+
+
+Strings:
+
+DESCx.BIN    - reactions
+DIALx.BIN    - dialog lines
+MOTSx.BIN    - names of locations, characters, level objects
+VEPCx.BIN    - names of actions, inventory items
+
+
+Scripts:
+
+TEMPL.BIN    - game script code
+
+
+Misc:
+
+CLEAR.BIN    - clean game state snapshot, autocreated. used to restart the game
+SOUCO.BIN    - ???
+
+
+LUTIN.BIN
+ICONE.BIN
+ALEAT.BIN    - random noise for PRNG
+ANIMA.BIN

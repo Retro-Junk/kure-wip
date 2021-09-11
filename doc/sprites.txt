@@ -1,0 +1,19 @@
+Sprite bank format - CGA
+
+Sprites are bundled to bank files and accessed by in-bank's index.
+
+Bank format:
+  BE32  data_size
+  B     bank_data[data_size]
+
+Bank data:
+  LE16  sprite_size
+  B     sprite_data[sprite_size - 2]
+  ...
+
+Sprite data:
+  B     height                   raster height
+  B     width                    raster width (sprite width = width * 4)
+  B     raster[width * height]   sprite pixels
+  B     masked                   if zero - solid sprite (all pixels drawn), else - transparent sprite
+  B     mask[]                   each bit denotes if a raster's pixel with color0 is transparent. bits processed from msb to lsb

@@ -1,0 +1,29 @@
+Zone format
+
+A "Zone" represents an unique room in the game. All zones are bundled in ZONES.BIN.
+
+NB! All "word" entries are stored in big-endian format!
+
+Zone entry format:
+  byte  Area               // Zone's Area index
+  byte  Room               // Room index
+  byte  Name               // Zone name
+  byte  Palette            // Zone palette
+  byte  NumSpots           // Number of Spots
+  // followed by NumSpots spot reactions entries:
+  struc Reactions[NumSpots] {
+    word Mask              // each non-zero bit from 4 to 0 signifies that corresponding reaction command is present
+    word Command[]         // up to 5 reaction commands for Psi powers: Sticky Fingers, Brainwarp, Know Mind, Psi Shift, Extreme Violence
+  }
+  // followed by NumSpots room spots records
+  struc Spots[NumSpots] {
+    prect Rect             // spot rect (packed screen-absolute coordinates)
+    byte  Flags            //
+    byte  Name             // spot name/hint
+    word  Command          // interaction command
+  }
+
+Area index specifies common index for different parts of the same (logical) zone.
+This is useful for zones that have multiple view angles and hence different Zone indexes.
+
+Room index specifies index in ARPLA.BIN , which is used to actually draw room's background/static objects.
