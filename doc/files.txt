@@ -21,14 +21,21 @@ FOND.BIN     - main background screen, compressed
 Sprite banks:
 
 SPRIT.BIN    - common sprites (inventory objects, etc.)
-PULLZ.BIN    - room sprites
+PULLZ.BIN    - room sprites / backgrounds
 PERS1.BIN    - portraits / character sprites
 PERS2.BIN    - -//-
+
+
+Sprite maps:
+
+LUTIN.BIN    - room character's sprite maps
+ICONE.BIN    - portrait sprite maps
 
 
 Animations:
 
 ANICO.BIN    - portraits animation sequences
+ANIMA.BIN    - sprite animation sequences
 
 
 Misc graphics:
@@ -61,9 +68,4 @@ Misc:
 
 CLEAR.BIN    - clean game state snapshot, autocreated. used to restart the game
 SOUCO.BIN    - ???
-
-
-LUTIN.BIN
-ICONE.BIN
 ALEAT.BIN    - random noise for PRNG
-ANIMA.BIN
