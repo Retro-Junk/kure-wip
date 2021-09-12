@@ -773,8 +773,8 @@ void DrawRoomStaticObject(unsigned char *aptr, unsigned char *rx, unsigned char 
 
 	sprite += 2;
 
-	*rx = x;
-	*ry = y;
+	*rx = x & 0x7F;
+	*ry = (y & 0x7F) * 2;
 	*rw = w;
 	*rh = h;
 
@@ -794,12 +794,15 @@ void DrawRoomStaticObject(unsigned char *aptr, unsigned char *rx, unsigned char 
 	}
 	y = (y * 2) & 0xFF;
 
-	if(aptr[0] == 83)
+	if(aptr[0] == 83)	/*Hand sprite from Who Will Be Saved room*/
 	{
 		if(arpla_y_step & 1)
 			y -= 8;
 		arpla_y_step >>= 1;
 	}
+
+	/*TODO: adjust ry accordingly? SCR_11_DrawRoomObject uses offs from adjusted y, but DrawRoomStatics relies on original y*/
+	/*TODO: check if this results in any glitches in Who Will Be Saved*/
 
 	if(aptr[1] & 0x80)
 		CGA_BlitSpriteFlip(sprite, pitch, w, h, backbuffer, CGA_CalcXY_p(x, y));
@@ -845,8 +848,6 @@ void DrawRoomStatics(void)
 		DrawRoomStaticObject(aptr, &x, &y, &w, &h);
 
 		/*update room's bounding rect*/
-		x &= 0x7F;
-		y = (y * 2) & 0xFF;
 		if(x < room_bounds_rect.sx)
 			room_bounds_rect.sx = x;
 		if(x + w > room_bounds_rect.ex)
