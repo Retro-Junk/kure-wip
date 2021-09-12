@@ -67,12 +67,12 @@ unsigned short next_ticks2 = 0;
 
 unsigned char zone_drawn;
 
-#define RECD_MAX 25
+#define VORTANIMS_MAX 25
 
 /*
 Vorts room enter/leave animations
 */
-vortanims_t vortsanim_list[RECD_MAX] = {
+vortanims_t vortsanim_list[VORTANIMS_MAX] = {
 	{ 2, { 3, 52, 113}, { 8, 43, 113}, {12, 43, 113}, {16, 43, 113}},
 	{ 3, { 6, 58, 120}, { 7, 33, 120}, {11, 33, 120}, {15, 33, 120}},
 	{ 4, { 2, 26, 121}, { 9, 43, 121}, {13, 43, 121}, {17, 43, 121}},
@@ -1164,7 +1164,7 @@ void PrepareCommand3(void)
 			if((spot->flags & ~SPOTFLG_80) == (SPOTFLG_40 | SPOTFLG_10))
 			{
 				int i;
-				for(i = 0;i < RECD_MAX;i++)
+				for(i = 0;i < VORTANIMS_MAX;i++)
 				{
 					if(vortsanim_list[i].room == script_byte_vars.zone_room)
 					{
