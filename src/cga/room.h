@@ -166,8 +166,8 @@ void BounceCurrentItem(unsigned char flags, unsigned char y);
 void BackupScreenOfSpecialRoom(void);
 void RestoreScreenOfSpecialRoom(void);
 
-void TheWallPhase3(void);
-void TheWallPhase0(void);
+void TheWallPhase3_DoorOpen1(void);
+void TheWallPhase0_DoorOpen2(void);
 void TheWallPhase1_DoorClose1(void);
 void TheWallPhase2_DoorClose2(void);
                                    

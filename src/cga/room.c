@@ -1450,105 +1450,94 @@ unsigned char * LoadMursmSprite(unsigned char index)
 	return sprit_load_buffer;
 }
 
-typedef struct thewall_t {
+typedef struct thewalldoor_t {
 unsigned char	height;
 unsigned char	width;
 unsigned int	pitch;
 unsigned int	offs;
 unsigned char	*pixels;
-} thewall_t;
+} thewalldoor_t;
 
-thewall_t the_wall_wall_b, the_wall_wall_a;
+thewalldoor_t the_wall_door_l, the_wall_door_r;
 
-unsigned int cur_image_width_full;
-
-void TheWallOpenRightDoor(unsigned char x, unsigned char y, unsigned char w, unsigned char h)
+void TheWallOpenRightDoor(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char limit)
 {
-	unsigned int ofs = CGA_CalcXY_p(x + w - 2, y);
-	unsigned char n = w - 1;
-	while(n)
-	{
-		CGA_HideScreenBlockLiftToRight(1, frontbuffer, backbuffer, n, h, frontbuffer, ofs);
-		n--;
-		if(n == cur_image_width_full)
-		{
-			/*ret n and ofs*/
-			return;
-		}
-	}
-	ofs += 1;
-	
+	unsigned int offs = CGA_CalcXY_p(x + width - 2, y);
 
-}
-
-void DrawWallA(unsigned int n, unsigned int limit, unsigned int w, unsigned char h, unsigned int ofs)
-{
-	do
+	while(--width)
 	{
-		CGA_HideScreenBlockLiftToRight(1, frontbuffer, backbuffer, w, h, frontbuffer, ofs);
-		w--;
-		if(n == limit)
+		CGA_HideScreenBlockLiftToRight(1, CGA_SCREENBUFFER, backbuffer, width, height, CGA_SCREENBUFFER, offs);
+		if(width == limit)
 			return;
 	}
-	while(n--);
 
-	ofs += 1;
+	offs++;
 
-	while(h--)
+	/*hide remaining column*/
+	/*TODO: move this to CGA?*/
+	while(height--)
 	{
-		memcpy(frontbuffer + ofs, backbuffer + ofs, 1);
-		ofs ^= CGA_ODD_LINES_OFS;
-		if((ofs & CGA_ODD_LINES_OFS) == 0)
-			ofs += CGA_BYTES_PER_LINE;
+		memcpy(frontbuffer + offs, backbuffer + offs, 1);
+
+		offs ^= CGA_ODD_LINES_OFS;
+		if((offs & CGA_ODD_LINES_OFS) == 0)
+			offs += CGA_BYTES_PER_LINE;
 	}
 }
 
-void DrawWallB(unsigned int n, unsigned int limit, unsigned int w, unsigned char h, unsigned int ofs)
+void TheWallOpenLeftDoor(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char limit)
 {
-	do
+	unsigned int offs = CGA_CalcXY_p(x + 1, y);
+
+	while(--width)
 	{
-		CGA_HideScreenBlockLiftToLeft(1, frontbuffer, backbuffer, w, h, frontbuffer, ofs);
-		w--;
-		if(n == limit)
+		CGA_HideScreenBlockLiftToLeft(1, CGA_SCREENBUFFER, backbuffer, width, height, CGA_SCREENBUFFER, offs);
+		if(width == limit)
 			return;
 	}
-	while(n--);
 
-	ofs -= 1;
+	offs--;
 
-	while(h--)
+	/*hide remaining column*/
+	/*TODO: move this to CGA?*/
+	while(height--)
 	{
-		memcpy(frontbuffer + ofs, backbuffer + ofs, 1);
-		ofs ^= CGA_ODD_LINES_OFS;
-		if((ofs & CGA_ODD_LINES_OFS) == 0)
-			ofs += CGA_BYTES_PER_LINE;
+		memcpy(frontbuffer + offs, backbuffer + offs, 1);
+
+		offs ^= CGA_ODD_LINES_OFS;
+		if((offs & CGA_ODD_LINES_OFS) == 0)
+			offs += CGA_BYTES_PER_LINE;
 	}
 }
 
-
-void TheWallPhase3(void)
+/*
+Animate The Wall doors
+Phase 3: Fully closed -> Half opened
+*/
+void TheWallPhase3_DoorOpen1(void)
 {
 	script_byte_vars.zone_index = (script_byte_vars.zone_index == 95) ? 9 : 102;
 	LoadZone();
 
-#if 0
-	cur_image_width_full = 40 / 4;
-	TheWallOpenRightDoor();
-#endif
-	/*TODO*/
+	TheWallOpenRightDoor(144 / 4, 32, 80 / 4, 59, 40 / 4);
+	TheWallOpenLeftDoor(64 / 4, 32, 80 / 4, 59, 40 / 4);
+
+	/*TODO: fill in the_wall_door_* structures, as they are used by the original code and appear in savefile*/
 }
 
-void TheWallPhase0(void)
+/*
+Animate The Wall doors
+Phase 0: Half opened -> Fully opened
+*/
+void TheWallPhase0_DoorOpen2(void)
 {
 	script_byte_vars.zone_index = (script_byte_vars.zone_index == 9) ? 24 : 30;
 	LoadZone();
-	/*TODO*/
 
-	/*	
-	DrawWallA(unsigned int n, 0, unsigned int w, unsigned char h, unsigned int ofs);
-	DrawWallB(unsigned int n, 0, unsigned int w, unsigned char h, unsigned int ofs);
-	*/
+	TheWallOpenRightDoor((144 + 40) / 4, 32, (80 - 40) / 4, 59, 0);
+	TheWallOpenLeftDoor(64 / 4, 32, (80 - 40) / 4, 59, 0);
 
+	/*TODO: fill in the_wall_door_* structures, as they are used by the original code and appear in savefile*/
 }
 
 /*
@@ -1570,6 +1559,8 @@ void TheWallPhase1_DoorClose1(void)
 	spr = LoadMursmSprite(1);
 	cur_image_coords_x = 220 / 4;
 	CGA_AnimLiftToLeft(10, spr, cur_frame_width, 1, cur_image_size_h, frontbuffer, CGA_CalcXY_p(cur_image_coords_x, cur_image_coords_y));
+
+	/*TODO: fill in the_wall_door_* structures, as they are used by the original code and appear in savefile*/
 }
 
 /*
@@ -1591,6 +1582,8 @@ void TheWallPhase2_DoorClose2(void)
 	spr = LoadMursmSprite(1);
 	cur_image_coords_x = 220 / 4;
 	CGA_AnimLiftToLeft(10, spr, cur_frame_width, 1 + 10, cur_image_size_h, frontbuffer, CGA_CalcXY_p(cur_image_coords_x, cur_image_coords_y) - 10);
+
+	/*TODO: fill in the_wall_door_* structures, as they are used by the original code and appear in savefile*/
 }
 
 /*

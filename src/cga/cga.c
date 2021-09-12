@@ -779,7 +779,9 @@ void CGA_HideScreenBlockLiftToLeft(unsigned int n, unsigned char *screen, unsign
 		for(i = 0;i < h;i++)
 		{
 			tofs = sofs - 1;
-			memcpy(target + tofs, screen + sofs, w);
+
+			/*use memmove since buffers may overlap*/
+			memmove(target + tofs, screen + sofs, w);
 
 			/*fill freed column*/
 			memcpy(target + tofs + w, source + tofs + w, 1);
@@ -802,7 +804,6 @@ void CGA_HideScreenBlockLiftToLeft(unsigned int n, unsigned char *screen, unsign
 /*NB! w is in bytes*/
 void CGA_HideScreenBlockLiftToRight(unsigned int n, unsigned char *screen, unsigned char *source, unsigned int w, unsigned int h, unsigned char *target, unsigned int ofs)
 {
-	/*TODO: check me if its ok*/
 	while(n--)
 	{
 		int i;
@@ -814,7 +815,9 @@ void CGA_HideScreenBlockLiftToRight(unsigned int n, unsigned char *screen, unsig
 		for(i = 0;i < h;i++)
 		{
 			tofs = sofs + 1;
-			memcpy(target + tofs - w, screen + sofs - w, w);
+
+			/*use memmove since buffers may overlap*/
+			memmove(target + tofs - w, screen + sofs - w, w);
 
 			/*fill freed column*/
 			memcpy(target + tofs - w, source + tofs - w, 1);

@@ -1262,10 +1262,10 @@ unsigned int SCR_3E_TheWallAdvance(void)
 	switch(script_byte_vars.the_wall_phase)
 	{
 	default:
-		TheWallPhase3();
+		TheWallPhase3_DoorOpen1();
 		break;
 	case 0:
-		TheWallPhase0();
+		TheWallPhase0_DoorOpen2();
 		break;
 	case 1:
 		TheWallPhase1_DoorClose1();
