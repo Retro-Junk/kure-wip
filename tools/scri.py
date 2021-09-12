@@ -207,6 +207,25 @@ def SH_ActionsMenu(block, offs, line, disp):
 
 	return offs, line + disp["m"] + " buttons:0x%X, choices:[%s]"%(buttons, choices)
 
+def SH_RoomSprite(block, offs, line, disp):
+	sprite = block[offs];
+	offs += 1
+	x = block[offs];
+	offs += 1
+	y = block[offs];
+	offs += 1
+
+	flags = ""
+	if x & 0x80:
+		flags += ", XFlip"
+	if y & 0x80:
+		flags += ", YFlip"
+
+	xx = (x & 0x7F) * 4
+	yy = (y & 0x7F) * 2
+
+	return offs, line + disp["m"] + " sprite:%d, x:%d, y:%d"%(sprite, xx, yy) + flags
+
 
 script_handlers = {
 0x01:{"m":"AspirantInventory"},
@@ -220,7 +239,7 @@ script_handlers = {
 0x0C:{"m":"DrawPortraitArc", "h":SH_IconDraw},
 0x0D:{"m":"DrawPortraitDotEffect", "h":SH_IconDraw},
 0x0E:{"m":"DrawPortraitZoomIn", "h":SH_IconDraw},
-0x11:{"m":"DrawRoomObject", "h":SH_Triplet},
+0x11:{"m":"DrawRoomObject", "h":SH_RoomSprite},
 0x12:{"m":"Chain", "h":SH_Word},				# jump to another subroutine
 0x13:{"m":"RedrawRoomStatics", "h":SH_Byte},
 0x14:{"m":"DrawDesciText", "h":SH_TextIndex, "t":desci},
@@ -279,7 +298,7 @@ script_handlers = {
 0x53:{"m":"FindInvItem", "h":SH_FindInvItem},
 0x59:{"m":"BlitSpritesToBackBuffer"},
 0x5A:{"m":"SelectPalette"},
-0x5F:{"m":"DrawRoomObjectBack", "h":SH_Triplet},
+0x5F:{"m":"DrawRoomObjectBack", "h":SH_RoomSprite},
 0x61:{"m":"DrawPersonBubbleDialog", "h":SH_TextIndex, "t":diali},
 0x64:{"m":"DrawBoxAroundSpot"},
 0x65:{"m":"DeProfundisMovePlatform", "h":SH_Byte},
