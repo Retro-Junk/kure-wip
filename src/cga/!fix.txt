@@ -2,7 +2,7 @@ Known bugs (not the original ones):
 1. Main hint box (location name) is wrongly positioned on x axis
 2. FIXED -- When actions menu shown, some garbage is left under cursor
 3. Moving cursor close to right edge of screen causes noticeable slowdown
-4. Doors open only half of their height
+4. FIXED -- Doors open only half of their height
 5. In some rooms main hint box text is misplaced
 6. FIXED -- Junk under cursor when clicked on psi powers menu (maybe related to 2)
 7. FIXED -- Clicking on inventory item does nothing (should open actions menu)

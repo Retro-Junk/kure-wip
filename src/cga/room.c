@@ -493,11 +493,15 @@ void AnimRoomDoorOpen(unsigned char index)
 {
 	int i;
 
+	unsigned char oldheight;
+
 	doorinfo_t *info = (doorinfo_t*)scratch_mem2;
 
 	InitRoomDoorInfo(index);
 
-	for(i = 0;i < info->layer[1].height / 2;i++)
+	oldheight = info->layer[1].height;
+
+	for(i = 0;i < oldheight / 2;i++)
 	{
 #if 1
 		DrawRoomDoor();
@@ -530,7 +534,7 @@ void AnimRoomDoorClose(unsigned char index)
 	
 	for(i = 0;i < oldheight / 2;i++)
 	{
-#if 0
+#if 1
 		DrawRoomDoor();
 #endif
 		info->layer[1].height += 2;
