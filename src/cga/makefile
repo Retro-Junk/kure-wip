@@ -34,7 +34,7 @@ menu.obj: menu.c common.h cga.h script.h input.h
 sound.obj: sound.c common.h sound.h
 timer.obj: timer.c common.h timer.h cga.h
 script.obj: script.c common.h script.h cga.h resdata.h
-savegame.obj: savegame.c common.h savegame.h script.h
+savegame.obj: savegame.c common.h savegame.h script.h room.h dialog.h resdata.h
 
 .c.obj:
 	$(CC) $<

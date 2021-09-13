@@ -401,7 +401,7 @@ typedef struct doorinfo_t {
 	unsigned char sprites[1];	/*variable size*/
 } doorinfo_t;
 
-unsigned char *doors_list[5];
+unsigned char *doors_list[MAX_DOORS];
 unsigned char arpla_y_step;
 
 /*
@@ -1451,15 +1451,7 @@ unsigned char * LoadMursmSprite(unsigned char index)
 	return sprit_load_buffer;
 }
 
-typedef struct thewalldoor_t {
-unsigned char	height;
-unsigned char	width;
-unsigned int	pitch;
-unsigned int	offs;
-unsigned char	*pixels;
-} thewalldoor_t;
-
-thewalldoor_t the_wall_door_l, the_wall_door_r;
+thewalldoor_t the_wall_doors[2];
 
 void TheWallOpenRightDoor(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char limit)
 {
@@ -1757,8 +1749,8 @@ void HideSpot(unsigned char offset)
 	found_spot->flags &= ~SPOTFLG_80;
 }
 
-static const unsigned char timed_seq[] = {56, 51, 44, 12, 10, 20, 18, 16, 14, 12, 44, 51};
-static const unsigned char *timed_seq_ptr = timed_seq;
+const unsigned char timed_seq[] = {56, 51, 44, 12, 10, 20, 18, 16, 14, 12, 44, 51};
+const unsigned char *timed_seq_ptr = timed_seq;
 
 /*
 Protozorq AI 1
