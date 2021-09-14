@@ -172,6 +172,7 @@ int LoadDesciData(void)
 {
 	while(!LoadFilesList(res_desci))
 		AskDisk2();
+	return 1;
 }
 
 ResEntry_t res_diali[] = {
@@ -186,4 +187,5 @@ int LoadDialiData(void)
 {
 	while(!LoadFilesList(res_diali))
 		AskDisk2();
+	return 1;
 }
