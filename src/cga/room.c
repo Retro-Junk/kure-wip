@@ -556,7 +556,7 @@ unsigned char FindInitialSpot(void)
 	unsigned char flags = script_byte_vars.byte_179B8;
 	if(flags == 0)
 		return 0;
-	flags |= 0x80;
+	flags |= SPOTFLG_80 | SPOTFLG_8;
 	for(index = 1, spot = zone_spots;spot != zone_spots_end;index++, spot++)
 	{
 		if(spot->flags == flags)
