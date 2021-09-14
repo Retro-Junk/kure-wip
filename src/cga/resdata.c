@@ -4,6 +4,9 @@
 #include "resdata.h"
 #include "decompr.h"
 
+extern void AskDisk2(void);
+extern int LoadSplash(char *filename);
+
 /*
 Get bank entry
 TODO: port SeekToString to this routine
