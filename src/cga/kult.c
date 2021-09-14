@@ -89,13 +89,13 @@ void GameLoop(unsigned char *target)
 		the_command = 0;
 		if(IsCursorInRect(&room_bounds_rect))
 		{
-			SelectCursor(CURSOR_1);
+			SelectCursor(CURSOR_TARGET);
 			command_hint = 100;
 			SelectSpotCursor();
 		}
 		else
 		{
-			SelectCursor(CURSOR_0);
+			SelectCursor(CURSOR_FINGER);
 			object_hint = 117;
 			CheckMenuCommandHover();
 		}

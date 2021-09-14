@@ -2347,7 +2347,7 @@ unsigned int CMD_2_PsiPowers(void)
 	do
 	{
 		PollInput();
-		SelectCursor(CURSOR_0);
+		SelectCursor(CURSOR_FINGER);
 		CheckPsiCommandHover();
 		if(command_hint != 100)
 			command_hint += 109;
@@ -2728,7 +2728,7 @@ unsigned int CMD_F_PsiPsiShift(void)
 		return ScriptRerun;
 	}
 
-	SelectCursor(CURSOR_4);
+	SelectCursor(CURSOR_GRAB);
 	MenuLoop(0, 0);
 	BackupScreenOfSpecialRoom();
 	PlaySound(25);

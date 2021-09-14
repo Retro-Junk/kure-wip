@@ -221,16 +221,16 @@ Select cursor shape for current spot
 */
 void SelectSpotCursor(void)
 {
-	int curs = 1;
+	int curs = CURSOR_TARGET;
 	CheckHotspots(script_byte_vars.spot_m, script_byte_vars.spot_v);
 	if(cursor_color == 0xAA)
 	{
-		curs = 6;
+		curs = CURSOR_BODY;
 		if((script_byte_vars.cur_spot_flags & (SPOTFLG_20 | SPOTFLG_10 | SPOTFLG_8)) != SPOTFLG_10)
 		{
-			curs = 7;
+			curs = CURSOR_ARROWS;
 			if((script_byte_vars.cur_spot_flags & SPOTFLG_20) != 0)
-				curs = 8;
+				curs = CURSOR_CROSSHAIR;
 		}
 	}
 	cursor_shape = souri_data + curs * CURSOR_WIDTH * CURSOR_HEIGHT * 2 / CGA_PIXELS_PER_BYTE;	

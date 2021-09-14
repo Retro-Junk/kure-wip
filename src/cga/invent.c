@@ -95,7 +95,7 @@ void OpenInventory(unsigned short filtermask, unsigned short filtervalue)
 	DrawInventoryBox(filtermask, filtervalue);
 	if(inv_count != 0)
 	{
-		SelectCursor(CURSOR_0);
+		SelectCursor(CURSOR_FINGER);
 		ProcessInput();
 		do
 		{
