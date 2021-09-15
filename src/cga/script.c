@@ -2983,10 +2983,12 @@ unsigned int CMD_14_VortAppear(void)
 
 pers_t *pers_vort_ptr;
 
+#define ADJACENT_AREAS_MAX 19
+
 struct {
-unsigned char room;
-unsigned char field_1;
-} vortleave[] = {
+unsigned char zone;	/* current zone */
+unsigned char area; /* area accessible from this zone */
+} adjacent_areas[ADJACENT_AREAS_MAX] = {
 	{  2,  5},
 	{  3,  8},
 	{  4,  8},
@@ -3040,13 +3042,13 @@ unsigned int CMD_15_VortLeave(void)
 
 	pers->area = 0;
 	next_command3 = 0;
-	for(i = 0;i < 19;i++)
+	for(i = 0;i < ADJACENT_AREAS_MAX;i++)
 	{
-		if(vortleave[i].room == script_byte_vars.zone_index)
+		if(adjacent_areas[i].zone == script_byte_vars.zone_index)
 		{
 			next_command3 = 0xA016;
 			next_ticks3 = Swap16(script_word_vars.timer_ticks2) + 5;
-			pers->area = vortleave[i].field_1;
+			pers->area = adjacent_areas[i].area;
 		}
 	}
 	pers_vort_ptr = pers;
@@ -3156,13 +3158,13 @@ unsigned int CMD_1F_TurkeyLeave(void)
 
 	pers->area = 0;
 	next_command4 = 0;
-	for(i = 0;i < 19;i++)
+	for(i = 0;i < ADJACENT_AREAS_MAX;i++)
 	{
-		if(vortleave[i].room == script_byte_vars.zone_index)
+		if(adjacent_areas[i].zone == script_byte_vars.zone_index)
 		{
 			next_command4 = 0xA020;
 			next_ticks4 = Swap16(script_word_vars.timer_ticks2) + 5;
-			pers->area = vortleave[i].field_1;
+			pers->area = adjacent_areas[i].area;
 		}
 	}
 
