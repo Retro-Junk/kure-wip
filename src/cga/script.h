@@ -133,12 +133,7 @@ unsigned char byte_17A23[4];    /* 6D */
 
 /*2-byte long vars, in BIG-endian order*/
 typedef struct script_word_vars_t {
-unsigned short word_17844;			/*  0 */
-unsigned short word_17846;			/*  2 */
-unsigned short word_17848;			/*  4 */
-unsigned short word_1784A;			/*  6 */
-unsigned short word_1784C;			/*  8 */
-unsigned short word_1784E;			/*  A */
+unsigned short psi_cmds[6];			/*  0 */
 unsigned short word_17850;			/*  C */
 unsigned short word_17852;			/*  E */
 unsigned short timer_ticks2;		/* 10 */

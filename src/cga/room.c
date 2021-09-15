@@ -119,6 +119,11 @@ static const unsigned char cga_color_sels[] = {
 	0x30,0x10,0x30,0x10,0x30,0x10,0x10,0x30,0x10,0x10,0x10,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x10,0x10,0x10
 };
 
+void SelectSpecificPalette(unsigned char index)
+{
+	CGA_ColorSelect(cga_color_sels[index]);
+}
+
 void SelectPalette(void)
 {
 	CGA_ColorSelect(cga_color_sels[script_byte_vars.palette_index]);
@@ -344,9 +349,6 @@ void LoadZone(void)
 
 void ResetZone(void)
 {
-	script_word_vars.word_178EE = 0;
-	script_word_vars.word_17852 = 0;
-	script_word_vars.word_17848 = 0;
 	script_byte_vars.byte_179F9 = 0;
 	script_byte_vars.byte_17A01 = 0;
 	script_byte_vars.byte_17A17 = 0;
@@ -356,12 +358,15 @@ void ResetZone(void)
 	script_byte_vars.byte_179EA = 0;
 	script_byte_vars.byte_179BE = 0;
 	script_byte_vars.byte_179EF = 0;
+	script_word_vars.psi_cmds[0] = BE(0x9048);
+	script_word_vars.psi_cmds[1] = BE(0xA01D);
+	script_word_vars.psi_cmds[2] = BE(0);
+	script_word_vars.psi_cmds[3] = BE(0x00F7);
+	script_word_vars.psi_cmds[4] = BE(0x9048);
+	script_word_vars.psi_cmds[5] = BE(0x9048);
 	script_word_vars.word_17850 = BE(0xA01C);
-	script_word_vars.word_1784A = BE(0x00F7);
-	script_word_vars.word_17844 = BE(0x9048);
-	script_word_vars.word_1784C = BE(0x9048);
-	script_word_vars.word_1784E = BE(0x9048);
-	script_word_vars.word_17846 = BE(0xA01D);
+	script_word_vars.word_17852 = BE(0);
+	script_word_vars.word_178EE = BE(0);
 }
 
 /*
@@ -1067,6 +1072,18 @@ void LoadLutinSprite(unsigned int lutidx)
 		else
 			MergeSpritesData(buffer, lutin_mem[0] * 2, sprite, sprw, sprh);
 	}
+}
+
+/*
+Draw specific room's person idle sprite
+*/
+void DrawCharacterSprite(unsigned char spridx, unsigned char x, unsigned char y, unsigned char *target)
+{
+	lutin_mem = scratch_mem2;
+
+	LoadLutinSprite(spridx);
+
+	DrawSprite(scratch_mem2, target, CGA_CalcXY_p(x, y));
 }
 
 /*

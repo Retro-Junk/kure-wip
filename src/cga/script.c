@@ -413,6 +413,16 @@ unsigned int SCR_3B_MathExpr(void)
 	return 0;
 }
 
+/*Discard current callchain (the real one) and execute command*/
+unsigned int SCR_4D_PriorityCommand(void)
+{
+	script_ptr++;
+	the_command = *script_ptr++;          /*little-endian*/
+	the_command |= (*script_ptr++) << 8;
+	the_command |= 0xF000;
+	return ScriptRerun;
+}
+
 /*Jump to routine*/
 unsigned int SCR_12_Chain(void)
 {
@@ -482,7 +492,6 @@ unsigned int SCR_35_Ret(void)
 	script_ptr = *(--script_stack_ptr);
 	return 0;
 }
-
 
 /*Draw portrait, pushing it from left to right*/
 unsigned int SCR_5_DrawPortraitLiftRight(void)
@@ -1093,6 +1102,15 @@ unsigned int SCR_5A_SelectPalette(void)
 {
 	script_ptr++;
 	SelectPalette();
+	return 0;
+}
+
+unsigned int SCR_5E_SelectTempPalette(void)
+{
+	unsigned char index;
+	script_ptr++;
+	index = *script_ptr++;
+	SelectSpecificPalette(index);
 	return 0;
 }
 
@@ -1738,6 +1756,64 @@ unsigned int SCR_32_FightWin(void)
 	return 0;
 }
 
+void DrawDeathAnim(void)
+{
+	int i;
+
+	/*remove existing cadaver if any*/
+	if(FindAndSelectSpot(38 * 5))
+	{
+		found_spot->flags &= ~SPOTFLG_80;
+		CGA_RestoreImage(*spot_sprite, backbuffer);
+	}
+
+	for(i = 0;i < 23;i++)
+	{
+		if(fightlist3[i].room == script_byte_vars.zone_room)
+		{
+			PlayAnim(fightlist3[i].anim.index, fightlist3[i].anim.params.coords.x, fightlist3[i].anim.params.coords.y);
+			break;
+		}
+	}
+}
+
+unsigned int SCR_16_DrawDeathAnim(void)
+{
+	script_ptr++;
+
+	DrawDeathAnim();
+
+	return 0;
+}
+
+unsigned int SCR_57_ShowCharacterSprite(void)
+{
+	unsigned char index, x, y;
+
+	script_ptr++;
+	index = *script_ptr++;
+	x = *script_ptr++;
+	y = *script_ptr++;
+
+	DrawCharacterSprite(index, x, y, frontbuffer);
+
+	return 0;
+}
+
+unsigned int SCR_58_DrawCharacterSprite(void)
+{
+	unsigned char index, x, y;
+
+	script_ptr++;
+	index = *script_ptr++;
+	x = *script_ptr++;
+	y = *script_ptr++;
+
+	DrawCharacterSprite(index, x, y, backbuffer);
+
+	return 0;
+}
+
 extern void ExitGame(void);
 
 unsigned int SCR_15_SelectSpot(void)
@@ -2049,6 +2125,52 @@ unsigned int SCR_50_BounceItemToInventory(void)
 	return 0;
 }
 
+/*
+Take away Protozorq's zapstik and bounce it to room
+*/
+unsigned int SCR_4B_ProtoDropZapstik(void)
+{
+	pers_t *pers = (pers_t*)(script_vars[ScrPool8_CurrentPers]);
+
+	script_ptr++;
+
+	if((pers->index & 0x38) != 0x30)
+		return 0;
+
+	pers->index &= ~0x18;
+
+	script_vars[ScrPool3_CurrentItem] = &inventory_items[38 + (script_byte_vars.cur_pers - 1) - 9];
+
+	BounceCurrentItem(ITEMFLG_40, 43);
+
+	return 0;
+}
+
+/*Take away a person's item*/
+void TakePersonsItem(void)
+{
+	if(pers_ptr->item != 0)
+	{
+		item_t *item = &inventory_items[pers_ptr->item - 1];
+		pers_ptr->item = 0;
+
+		script_vars[ScrPool3_CurrentItem] = item;
+		script_byte_vars.byte_179F1++;
+		script_byte_vars.byte_17A23[pers_ptr->index >> 6] = item->name;	/*TODO: check these index bits*/
+		BounceCurrentItem(ITEMFLG_80, 85);
+		the_command = 0x90AA;	/*OK*/
+	}
+	else
+		the_command = 0x9140;	/*NOTHING ON HIM*/
+}
+
+unsigned int SCR_2F_TakePersonsItem()
+{
+	script_ptr++;
+	TakePersonsItem();
+	return ScriptRerun;
+}
+
 unsigned int SCR_51_ItemTrade(void)
 {
 	unsigned char *old_script, *old_script_end = script_end_ptr;
@@ -2129,6 +2251,88 @@ unsigned int SCR_53_FindInvItem(void)
 	script_vars[ScrPool3_CurrentItem] = &item[count - 1];
 	return 0;
 }
+
+unsigned int SCR_55_DrawRoomItemsIndicator(void)
+{
+	script_ptr++;
+	DrawRoomItemsIndicator();
+	return 0;
+}
+
+/*
+Discard all inventory items
+*/
+unsigned int SCR_5C_ClearInventory(void)
+{
+	int i;
+	script_ptr++;
+
+	for(i = 0;i < MAX_INV_ITEMS;i++)
+	{
+		if(inventory_items[i].flags == ITEMFLG_80)
+			inventory_items[i].flags = 0;
+	}
+
+	script_byte_vars.room_items = 0;
+
+	return 0;
+}
+
+/*
+Drop group of items from inventory to room
+*/
+void DropItems(int first, int count)
+{
+	int i;
+
+	for(i = 0;i < count;i++)
+	{
+		if(inventory_items[first + i].flags == ITEMFLG_80)
+		{
+			inventory_items[first + i].flags = ITEMFLG_40;
+			inventory_items[first + i].flags2 = script_byte_vars.zone_area;
+		}
+	}
+}
+
+/*
+Drop weapon-like items from inventory to room
+*/
+unsigned int SCR_5D_DropWeapons(void)
+{
+	script_ptr++;
+
+	DropItems(18, 4);	/*DAGGER*/
+	DropItems(38, 14);	/*ZAPSTIK*/
+	DropItems(55, 2);	/*SACRIFICIAL BLADE , CHOPPER*/
+
+	script_byte_vars.room_items = 0;
+	
+	return 0;
+}
+
+/*
+React to Psi power
+*/
+unsigned int SCR_62_PsiReaction(void)
+{
+	unsigned char power;
+	unsigned short cmd;
+
+	script_ptr++;
+	power = *script_ptr++;
+
+	cmd = script_word_vars.zone_obj_cmds[(script_byte_vars.cur_spot_idx - 1) * 5 + power];
+	if(cmd == 0)
+		cmd = script_word_vars.psi_cmds[power];	/*TODO: is this consistent with zone_obj_cmds?*/
+
+	the_command = Swap16(cmd);
+
+	return 0;
+}
+
+
+
 
 
 unsigned int SCR_64_DrawBoxAroundSpot(void)
@@ -2588,8 +2792,8 @@ unsigned int CMD_B_PsiStickyFingers(void)
 	CGA_BackBufferToRealFull();
 	RestoreScreenOfSpecialRoom();
 
-	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(0) == 0)
-		the_command = Swap16(script_word_vars.word_17844);
+	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(0 * 2) == 0)
+		the_command = Swap16(script_word_vars.psi_cmds[0]);
 
 	if(script_byte_vars.byte_179DC >= 63
 	&& script_byte_vars.zone_area < 22
@@ -2612,8 +2816,8 @@ unsigned int CMD_C_PsiKnowMind(void)
 
 	ProcessMenu();
 
-	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(4) == 0)
-		the_command = Swap16(script_word_vars.word_17846);
+	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(2 * 2) == 0)
+		the_command = Swap16(script_word_vars.psi_cmds[1]);
 
 	return ScriptRerun;
 }
@@ -2635,7 +2839,7 @@ unsigned int CMD_D_PsiBrainwarp(void)
 			return ScriptRerun;
 		}
 
-		if(GetZoneObjCommand(2) != 0)
+		if(GetZoneObjCommand(1 * 2) != 0)
 		{
 			PlayAnim(39, found_spot->sx + 8 / 4, found_spot->sy - 10);
 			RestoreScreenOfSpecialRoom();
@@ -2711,7 +2915,7 @@ unsigned int CMD_E_PsiZoneScan(void)
 
 	RestoreScreenOfSpecialRoom();
 
-	the_command = Swap16(script_word_vars.word_17848);
+	the_command = Swap16(script_word_vars.psi_cmds[2]);
 	
 	return ScriptRerun;
 
@@ -2735,8 +2939,8 @@ unsigned int CMD_F_PsiPsiShift(void)
 	PlayAnim(39, cursor_x / 4, cursor_y);
 	RestoreScreenOfSpecialRoom();
 
-	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(6) == 0)
-		the_command = Swap16(script_word_vars.word_1784E);
+	if(script_byte_vars.cur_spot_idx == 0 || GetZoneObjCommand(3 * 2) == 0)
+		the_command = Swap16(script_word_vars.psi_cmds[5]);
 	
 	return ScriptRerun;
 }
@@ -2760,18 +2964,18 @@ unsigned int CMD_10_PsiExtremeViolence(void)
 
 	if(script_byte_vars.cur_spot_idx == 0)
 	{
-		the_command = Swap16(script_word_vars.word_1784C);
+		the_command = Swap16(script_word_vars.psi_cmds[4]);
 		script_byte_vars.byte_179F3 = 0;
 		return ScriptRerun;
 	}
 
-	command = GetZoneObjCommand(8);
+	command = GetZoneObjCommand(4 * 2);
 
 	if((command & 0xF000) == 0x9000)
 		script_byte_vars.byte_179F3 = 0;
 	else if(command == 0)
 	{
-		the_command = Swap16(script_word_vars.word_1784C);
+		the_command = Swap16(script_word_vars.psi_cmds[4]);
 		script_byte_vars.byte_179F3 = 0;
 	}
 
@@ -2791,7 +2995,7 @@ unsigned int CMD_11_PsiTuneIn(void)
 	else
 	{
 		if(script_byte_vars.byte_179DC < 63 || script_byte_vars.zone_area >= 22)
-			command = Swap16(script_word_vars.word_1784A);
+			command = Swap16(script_word_vars.psi_cmds[3]);
 		else
 			command = 275;
 	}
@@ -3071,6 +3275,12 @@ unsigned int CMD_16_VortGone(void)
 	return 0;
 }
 
+unsigned int CMD_17_TakePersonsItem()
+{
+	TakePersonsItem();
+	return ScriptRerun;
+}
+
 unsigned int CMD_18_AspirantLeave(void)
 {
 	/*TODO: check me*/
@@ -3282,7 +3492,7 @@ cmdhandler_t command_handlers[] = {
 	CMD_14_VortAppear,
 	CMD_15_VortLeave,
 	CMD_16_VortGone,
-	CMD_TRAP,
+	CMD_17_TakePersonsItem,
 	CMD_18_AspirantLeave,
 	CMD_TRAP,
 	CMD_TRAP,
@@ -3324,7 +3534,7 @@ cmdhandler_t script_handlers[] = {
 	SCR_13_RedrawRoomStatics,
 	SCR_14_DrawDesc,
 	SCR_15_SelectSpot,
-	SCR_TRAP,
+	SCR_16_DrawDeathAnim,
 	SCR_17_DrawPersonThoughtBubbleDialog,
 	SCR_18_AnimPortrait,
 	SCR_19_HidePortraitLiftLeft,
@@ -3349,7 +3559,7 @@ cmdhandler_t script_handlers[] = {
 	SCR_2C_Wait4,
 	SCR_2D_Wait,
 	SCR_2E_PromptWait,
-	SCR_TRAP,
+	SCR_2F_TakePersonsItem,
 	SCR_30_Fight,	/*30*/
 	SCR_31_Fight2,
 	SCR_32_FightWin,
@@ -3377,9 +3587,9 @@ cmdhandler_t script_handlers[] = {
 	SCR_48_DeProfundisLowerMonster,
 	SCR_49_DeProfundisRiseHook,
 	SCR_TRAP,
-	SCR_TRAP,
+	SCR_4B_ProtoDropZapstik,
 	SCR_4C_DrawZoneObjs,
-	SCR_TRAP,
+	SCR_4D_PriorityCommand,
 	SCR_4E_BounceCurrentItemToRoom,
 	SCR_4F_BounceCurrentItemToInventory,
 	SCR_50_BounceItemToInventory,	/*50*/
@@ -3387,20 +3597,20 @@ cmdhandler_t script_handlers[] = {
 	SCR_52_RefreshSpritesData,
 	SCR_53_FindInvItem,
 	SCR_TRAP,
+	SCR_55_DrawRoomItemsIndicator,
 	SCR_TRAP,
-	SCR_TRAP,
-	SCR_TRAP,
-	SCR_TRAP,
+	SCR_57_ShowCharacterSprite,
+	SCR_58_DrawCharacterSprite,
 	SCR_59_BlitSpritesToBackBuffer,
 	SCR_5A_SelectPalette,
 	SCR_TRAP,
-	SCR_TRAP,
-	SCR_TRAP,
-	SCR_TRAP,
+	SCR_5C_ClearInventory,
+	SCR_5D_DropWeapons,
+	SCR_5E_SelectTempPalette,
 	SCR_5F_DrawRoomObjectBack,
 	SCR_TRAP,	/*60*/
 	SCR_61_DrawPersonBubbleDialog,
-	SCR_TRAP,
+	SCR_62_PsiReaction,
 	SCR_TRAP,
 	SCR_64_DrawBoxAroundSpot,
 	SCR_65_DeProfundisMovePlatform,
@@ -3512,7 +3722,7 @@ again:;
 		res = command_handlers[cmd]();
 		break;
 	case 0xF000:
-		/*restore sp from keep_sp*/
+		/*restore sp from keep_sp then run script*/
 		TODO("SCR_RESTORE\n");
 	default:
 		res = RunScript(GetScriptSubroutine(cmd - 1));

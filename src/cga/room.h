@@ -152,6 +152,7 @@ void ShowObjectHint(unsigned char *target);
 void DrawCommandHint(void);
 void ShowCommandHint(unsigned char *target);
 
+void DrawCharacterSprite(unsigned char spridx, unsigned char x, unsigned char y, unsigned char *target);
 char DrawZoneAniSprite(rect_t *rect, unsigned int index, unsigned char *target);
 
 void DrawHintsAndCursor(unsigned char *target);
@@ -165,6 +166,7 @@ void BlitSpritesToBackBuffer(void);
 void BackupSpotsImages(void);
 
 void SelectPalette(void);
+void SelectSpecificPalette(unsigned char index);
 
 unsigned char FindSpotByFlags(unsigned char mask, unsigned char value);
 unsigned char FindAndSelectSpot(unsigned char offset);
@@ -172,6 +174,7 @@ unsigned char FindAndSelectSpot(unsigned char offset);
 void FindPerson(void);
 
 void UpdateZoneSpot(unsigned char index);
+void DrawRoomItemsIndicator(void);
 void DrawRoomStaticObject(unsigned char *aptr, unsigned char *rx, unsigned char *ry, unsigned char *rw, unsigned char *rh);
 void DrawRoomStatics(void);
 void RedrawRoomStatics(unsigned char index, unsigned char y_step);
