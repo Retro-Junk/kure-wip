@@ -39,7 +39,7 @@ spot_t *zone_spots_end;
 spot_t *zone_spots_cur;
 
 vortanims_t *vortanims_ptr;
-rec7_t *rec7_ptr;
+turkeyanims_t *turkeyanims_ptr;
 pers_t *pers_ptr;
 spot_t *spot_ptr;
 spot_t *found_spot;
@@ -100,9 +100,9 @@ vortanims_t vortsanim_list[VORTANIMS_MAX] = {
 	{61, {29, 23, 123}, {30, 23, 123}, {31, 23, 123}, {32, 23, 123}}
 };
 
-#define RECS7_MAX 10
+#define TURKEYANIMS_MAX 10
 
-rec7_t recs7_list[RECS7_MAX] = {
+turkeyanims_t turkeyanim_list[TURKEYANIMS_MAX] = {
 	{50, {61, 14, 140}, {62, 14, 140}},
 	{51, {61, 14, 143}, {62, 14, 143}},
 	{53, {61, 20, 153}, {62, 20, 153}},
@@ -1302,11 +1302,11 @@ void PrepareCommand4(void)
 		{
 			int i;
 
-			for(i = 0;i < RECS7_MAX;i++)
+			for(i = 0;i < TURKEYANIMS_MAX;i++)
 			{
-				if(recs7_list[i].room == script_byte_vars.zone_room)
+				if(turkeyanim_list[i].room == script_byte_vars.zone_room)
 				{
-					rec7_ptr = &recs7_list[i];
+					turkeyanims_ptr = &turkeyanim_list[i];
 					if(script_byte_vars.zone_area == pers_list[5].area)
 					{
 						next_command4 = 0xA01F;

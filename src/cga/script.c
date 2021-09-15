@@ -3126,9 +3126,57 @@ unsigned int CMD_1B_Holo(void)
 }
 
 /*
-TODO: check me
+Turkey walking into the room
 */
-unsigned int CMD_20_(void)
+unsigned int CMD_1E_TurkeyAppear(void)
+{
+	/*TODO: check me*/
+	pers_list[5].area = script_byte_vars.zone_area;
+	FindAndSelectSpot(5 * 5);
+	AnimateSpot(&turkeyanims_ptr->field_1);
+	next_command4 = 0xA01F;
+	BlitSpritesToBackBuffer();
+	DrawZoneObjs();
+	CGA_BackBufferToRealFull();
+	next_ticks4 = Swap16(script_word_vars.timer_ticks2) + 5;
+	return 0;
+}
+
+/*
+Turkey leaving the room
+*/
+unsigned int CMD_1F_TurkeyLeave(void)
+{
+	unsigned int i;
+	animdesc_t *anim;
+	pers_t *pers;
+
+	pers = &pers_list[5];
+	anim = &turkeyanims_ptr->field_4;
+
+	pers->area = 0;
+	next_command4 = 0;
+	for(i = 0;i < 19;i++)
+	{
+		if(vortleave[i].room == script_byte_vars.zone_index)
+		{
+			next_command4 = 0xA020;
+			next_ticks4 = Swap16(script_word_vars.timer_ticks2) + 5;
+			pers->area = vortleave[i].field_1;
+		}
+	}
+
+	zone_spots[(pers->flags & 15) - 1].flags &= ~SPOTFLG_80;	
+
+	FindAndSelectSpot(5 * 5);
+	AnimateSpot(anim);
+	return 0;
+}
+
+/*
+Turkey left the room
+*/
+unsigned int CMD_20_TurkeyGone(void)
 {
 	pers_list[5].area = 0;
 	next_command4 = 0;
@@ -3239,9 +3287,9 @@ cmdhandler_t command_handlers[] = {
 	CMD_1B_Holo,
 	CMD_TRAP,
 	CMD_TRAP,
-	CMD_TRAP,
-	CMD_TRAP,
-	CMD_TRAP,	/*20*/
+	CMD_1E_TurkeyAppear,
+	CMD_1F_TurkeyLeave,
+	CMD_20_TurkeyGone,	/*20*/
 	CMD_21_VortTalk,
 	CMD_22_,
 	CMD_23_,

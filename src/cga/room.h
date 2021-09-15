@@ -64,11 +64,11 @@ typedef struct vortanims_t {
 	animdesc_t field_A;
 } vortanims_t;
 
-typedef struct rec7_t {
+typedef struct turkeyanims_t {
 	unsigned char room;
 	animdesc_t field_1;
 	animdesc_t field_4;
-} rec7_t;
+} turkeyanims_t;
 
 extern unsigned char scratch_mem1[8010];
 extern unsigned char *scratch_mem2;
@@ -103,8 +103,8 @@ extern spot_t *zone_spots_cur;
 extern vortanims_t vortsanim_list[];
 extern vortanims_t *vortanims_ptr;
 
-extern rec7_t recs7_list[];
-extern rec7_t *rec7_ptr;
+extern turkeyanims_t turkeyanim_list[];
+extern turkeyanims_t *turkeyanims_ptr;
 extern pers_t *pers_ptr;
 extern spot_t *spot_ptr;
 extern spot_t *found_spot;
