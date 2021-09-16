@@ -33,11 +33,11 @@ typedef struct spot_t {
 /*person*/
 /*TODO: manipulated from script, do not change*/
 typedef struct pers_t {
-	unsigned char area;		/*location*/
-	unsigned char flags;	/*flags in bits 7..4 and room index in bits 3..0*/
-	unsigned char name;		/*name index*/
-	unsigned char index;	/*animations index (in lutins_table) in bits 7..3 , spot index in bits 2..0*/
-	unsigned char item;		/*inventory item index (1-based)*/
+	unsigned char area;     /*location*/
+	unsigned char flags;    /*flags in bits 7..4 and room index in bits 3..0*/
+	unsigned char name;     /*name index*/
+	unsigned char index;    /*animations index (in lutins_table) in bits 7..3 , spot index in bits 2..0*/
+	unsigned char item;     /*inventory item index (1-based)*/
 } pers_t;
 
 #if sizeof(pers_t) != 5
@@ -47,13 +47,13 @@ typedef struct pers_t {
 #define ANIMFLG_USESPOT 0x80
 
 typedef struct animdesc_t {
-unsigned char index;	/*flag in bit 7, animation index in bits 6..0*/
-union {
-	struct {
-		unsigned char x, y;
-	} coords;
-	unsigned short desc;
-} params;
+	unsigned char index;    /*flag in bit 7, animation index in bits 6..0*/
+	union {
+		struct {
+			unsigned char x, y;
+		} coords;
+		unsigned short desc;
+	} params;
 } animdesc_t;
 
 typedef struct vortanims_t {
@@ -129,11 +129,11 @@ extern const unsigned char timed_seq[];
 extern const unsigned char *timed_seq_ptr;
 
 typedef struct thewalldoor_t {
-unsigned char	height;
-unsigned char	width;
-unsigned int	pitch;
-unsigned int	offs;
-unsigned char	*pixels;
+	unsigned char   height;
+	unsigned char   width;
+	unsigned int    pitch;
+	unsigned int    offs;
+	unsigned char   *pixels;
 } thewalldoor_t;
 
 extern thewalldoor_t the_wall_doors[2];
@@ -145,7 +145,7 @@ void SelectSpotCursor(void);
 void CheckHotspots(unsigned char m, unsigned char v);
 
 void AnimateSpot(const animdesc_t *info);
-unsigned char * LoadPuzzlToScratch(unsigned char index);
+unsigned char *LoadPuzzlToScratch(unsigned char index);
 
 void DrawObjectHint(void);
 void ShowObjectHint(unsigned char *target);
@@ -200,7 +200,7 @@ void TheWallPhase3_DoorOpen1(void);
 void TheWallPhase0_DoorOpen2(void);
 void TheWallPhase1_DoorClose1(void);
 void TheWallPhase2_DoorClose2(void);
-                                   
+
 void PrepareCommand1(void);
 void PrepareCommand3(void);
 void PrepareCommand4(void);

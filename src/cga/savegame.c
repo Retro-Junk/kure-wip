@@ -8,16 +8,14 @@
 #include "room.h"
 #include "dialog.h"
 
-void SaveRestartGame(void)
-{
+void SaveRestartGame(void) {
 	/*TODO*/
 }
 
-void RestartGame(void)
-{
+void RestartGame(void) {
 	/*
 	while(!LoadFile("CLEAR.BIN", save_start))
-		AskDisk2();
+	    AskDisk2();
 	*/
 
 	script_byte_vars.cur_spot_flags = 0xFF;
@@ -46,10 +44,10 @@ void RestartGame(void)
 #define CGA_SAVE_TURKEYANIMS_OFS 0xA74E
 #define CGA_SAVE_TIMEDSEQ_OFS  0xA7C0
 
-#define SAVEADDR(value, base, nativesize, origsize, origbase)	\
+#define SAVEADDR(value, base, nativesize, origsize, origbase)   \
 	((value) ? LE16(((((unsigned char*)(value)) - (unsigned char*)(base)) / nativesize) * origsize + origbase) : 0)
 
-#define LOADADDR(value, base, nativesize, origsize, origbase)	\
+#define LOADADDR(value, base, nativesize, origsize, origbase)   \
 	((value) ? ((((LE16(value)) - (origbase)) / origsize) * nativesize + (unsigned char*)base) : 0)
 
 #define WRITE(buffer, size) \
@@ -58,8 +56,7 @@ void RestartGame(void)
 #define READ(buffer, size) \
 	rlen = read(f, buffer, size); if(rlen != size) goto error;
 
-int LoadScena(void)
-{
+int LoadScena(void) {
 	int f;
 	int rlen;
 	unsigned short zero = 0;
@@ -70,25 +67,24 @@ int LoadScena(void)
 
 
 	f = open("SCENAx.BIN", O_RDONLY | O_BINARY);
-	if(f == -1)
-	{
+	if (f == -1) {
 		script_byte_vars.game_paused = 0;
-		return 1;	/*error*/
+		return 1;   /*error*/
 	}
 	/*
 	Save format:
 	  vars memory (751E-9D5D)
 	  frontbuffer (0x3FFF bytes)
-      backbuffer  (0x3FFF bytes)
+	  backbuffer  (0x3FFF bytes)
 	*/
 
-	#define BYTES(buffer, size) READ(buffer, size)
-	#define UBYTE(variable) { unsigned char temp_v; READ(&temp_v, 1); variable = temp_v; }
-	#define SBYTE(variable) { signed char temp_v; READ(&temp_v, 1); variable = temp_v; }
-	#define USHORT(variable) { unsigned short temp_v; READ(&temp_v, 2); variable = temp_v; }
-	#define SSHORT(variable) { signed short temp_v; READ(&temp_v, 2); variable = temp_v; }
-	#define POINTER(variable, base, nativesize, origsize, origbase) \
-		{ signed short temp_v; READ(&temp_v, 2); variable = LOADADDR(temp_v, base, nativesize, origsize, origbase); }
+#define BYTES(buffer, size) READ(buffer, size)
+#define UBYTE(variable) { unsigned char temp_v; READ(&temp_v, 1); variable = temp_v; }
+#define SBYTE(variable) { signed char temp_v; READ(&temp_v, 1); variable = temp_v; }
+#define USHORT(variable) { unsigned short temp_v; READ(&temp_v, 2); variable = temp_v; }
+#define SSHORT(variable) { signed short temp_v; READ(&temp_v, 2); variable = temp_v; }
+#define POINTER(variable, base, nativesize, origsize, origbase) \
+	{ signed short temp_v; READ(&temp_v, 2); variable = LOADADDR(temp_v, base, nativesize, origsize, origbase); }
 
 	/*script_vars pointers*/
 	POINTER(script_vars[ScrPool0_WordVars0], &script_word_vars, 2, 2, CGA_SAVE_WORD_VARS_OFS);
@@ -102,34 +98,31 @@ int LoadScena(void)
 	POINTER(script_vars[ScrPool8_CurrentPers], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* sprites_list */
-	for(i = 0;i < MAX_SPRITES;i++)
-	{
+	for (i = 0; i < MAX_SPRITES; i++) {
 		POINTER(sprites_list[i], scratch_mem1, 1, 1, CGA_SAVE_SPRITES_OFS);
 	}
 
 	/* doors list */
-	for(i = 0;i < MAX_DOORS;i++)
-	{
+	for (i = 0; i < MAX_DOORS; i++) {
 		POINTER(doors_list[i], arpla_data, 1, 1, CGA_SAVE_ARPLA_OFS);
 	}
 
 	/* zone_spots */
-	POINTER((unsigned char*)zone_spots, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	POINTER((unsigned char *)zone_spots, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* zone_spots_end */
-	POINTER((unsigned char*)zone_spots_end, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	POINTER((unsigned char *)zone_spots_end, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* zone_spots_cur */
-	POINTER((unsigned char*)zone_spots_cur, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	POINTER((unsigned char *)zone_spots_cur, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* script_stack_ptr */
 	/*TODO: FIX ME: original stack works in reverse order (from higher address to lower)*/
-	POINTER((unsigned char*)script_stack_ptr, script_stack, 1, 1, CGA_SAVE_SCRSTACK_OFS);
+	POINTER((unsigned char *)script_stack_ptr, script_stack, 1, 1, CGA_SAVE_SCRSTACK_OFS);
 
 	/* script_stack */
 	/*TODO: FIX ME: original stack works in reverse order (from higher address to lower)*/
-	for(i = 0;i < 5*2;i++)
-	{
+	for (i = 0; i < 5 * 2; i++) {
 		POINTER(script_stack[i], templ_data, 1, 1, CGA_SAVE_TEMPL_OFS);
 	}
 
@@ -137,25 +130,25 @@ int LoadScena(void)
 	USHORT(zero);
 
 	/* pers_vort_ptr */
-	POINTER((unsigned char*)pers_vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	POINTER((unsigned char *)pers_vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* vortanims_ptr */
-	POINTER((unsigned char*)vortanims_ptr, vortsanim_list, 1, 1, CGA_SAVE_VORTANIMS_OFS);
+	POINTER((unsigned char *)vortanims_ptr, vortsanim_list, 1, 1, CGA_SAVE_VORTANIMS_OFS);
 
 	/* turkeyanims_ptr */
-	POINTER((unsigned char*)turkeyanims_ptr, turkeyanim_list, 1, 1, CGA_SAVE_TURKEYANIMS_OFS);
+	POINTER((unsigned char *)turkeyanims_ptr, turkeyanim_list, 1, 1, CGA_SAVE_TURKEYANIMS_OFS);
 
 	/* pers_ptr */
-	POINTER((unsigned char*)pers_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	POINTER((unsigned char *)pers_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* spot_ptr */
-	POINTER((unsigned char*)spot_ptr, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	POINTER((unsigned char *)spot_ptr, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* found_spot */
-	POINTER((unsigned char*)found_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	POINTER((unsigned char *)found_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* spot_sprite */
-	POINTER((unsigned char*)spot_sprite, sprites_list, sizeof(sprites_list[0]), 2, CGA_SAVE_SPRLIST_OFS);
+	POINTER((unsigned char *)spot_sprite, sprites_list, sizeof(sprites_list[0]), 2, CGA_SAVE_SPRLIST_OFS);
 
 	/* timed_seq_ptr */
 	POINTER(timed_seq_ptr, timed_seq, 1, 1, CGA_SAVE_TIMEDSEQ_OFS);
@@ -172,8 +165,7 @@ int LoadScena(void)
 	UBYTE(zero);
 
 	/* the wall doors state */
-	for(i = 0;i < 2;i++)
-	{
+	for (i = 0; i < 2; i++) {
 		thewalldoor_t *door = &the_wall_doors[i];
 		UBYTE(door->height);
 		UBYTE(door->width);
@@ -189,8 +181,7 @@ int LoadScena(void)
 	UBYTE(zero);
 
 	/* dirty_rects */
-	for(i = 0;i < MAX_DIRTY_RECT;i++)
-	{
+	for (i = 0; i < MAX_DIRTY_RECT; i++) {
 		dirty_rect_t *dr = &dirty_rects[i];
 		UBYTE(dr->kind);
 		USHORT(dr->offs);
@@ -201,8 +192,7 @@ int LoadScena(void)
 	}
 
 	/* inventory_items */
-	for(i = 0;i < MAX_INV_ITEMS;i++)
-	{
+	for (i = 0; i < MAX_INV_ITEMS; i++) {
 		/*TODO: properly serialize this*/
 		BYTES(&inventory_items[i], sizeof(item_t));
 	}
@@ -221,8 +211,7 @@ int LoadScena(void)
 	USHORT(fight_pers_ofs);
 
 	/* pers_list */
-	for(i = 0;i < PERS_MAX;i++)
-	{
+	for (i = 0; i < PERS_MAX; i++) {
 		/*TODO: properly serialize this*/
 		BYTES(&pers_list[i], sizeof(pers_t));
 	}
@@ -298,7 +287,7 @@ int LoadScena(void)
 	USHORT(next_ticks2);
 
 	/* padding */
-	for(i = 0;i < 7;i++) USHORT(zero);
+	for (i = 0; i < 7; i++) USHORT(zero);
 
 	/* script_byte_vars */
 	BYTES(&script_byte_vars, sizeof(script_byte_vars));
@@ -314,12 +303,12 @@ int LoadScena(void)
 
 	BYTES(backbuffer, 0x3FFF);
 
-	#undef BYTES
-	#undef UBYTE
-	#undef SBYTE
-	#undef USHORT
-	#undef SSHORT
-	#undef POINTER
+#undef BYTES
+#undef UBYTE
+#undef SBYTE
+#undef USHORT
+#undef SSHORT
+#undef POINTER
 
 	/*re-initialize sprites list*/
 	BackupSpotsImages();
@@ -334,8 +323,7 @@ error:;
 	return 1;
 }
 
-int SaveScena(void)
-{
+int SaveScena(void) {
 	int f;
 	int wlen;
 	unsigned short zero = 0;
@@ -346,19 +334,18 @@ int SaveScena(void)
 	BlitSpritesToBackBuffer();
 
 	f = open("SCENAx.BIN", O_CREAT | O_WRONLY | O_BINARY);
-	if(f == -1)
-	{
+	if (f == -1) {
 		script_byte_vars.game_paused = 0;
-		return 1;	/*error*/
+		return 1;   /*error*/
 	}
 
-	#define BYTES(buffer, size) WRITE(buffer, size)
-	#define UBYTE(variable) { unsigned char temp_v = variable; WRITE(&temp_v, 1); }
-	#define SBYTE(variable) { signed char temp_v = variable; WRITE(&temp_v, 1); }
-	#define USHORT(variable) { unsigned short temp_v = variable; WRITE(&temp_v, 2); }
-	#define SSHORT(variable) { signed short temp_v = variable; WRITE(&temp_v, 2); }
-	#define POINTER(variable, base, nativesize, origsize, origbase) \
-		{ signed short temp_v = SAVEADDR(variable, base, nativesize, origsize, origbase); WRITE(&temp_v, 2); }
+#define BYTES(buffer, size) WRITE(buffer, size)
+#define UBYTE(variable) { unsigned char temp_v = variable; WRITE(&temp_v, 1); }
+#define SBYTE(variable) { signed char temp_v = variable; WRITE(&temp_v, 1); }
+#define USHORT(variable) { unsigned short temp_v = variable; WRITE(&temp_v, 2); }
+#define SSHORT(variable) { signed short temp_v = variable; WRITE(&temp_v, 2); }
+#define POINTER(variable, base, nativesize, origsize, origbase) \
+	{ signed short temp_v = SAVEADDR(variable, base, nativesize, origsize, origbase); WRITE(&temp_v, 2); }
 
 	/*script_vars pointers*/
 	POINTER(script_vars[ScrPool0_WordVars0], &script_word_vars, 2, 2, CGA_SAVE_WORD_VARS_OFS);
@@ -372,14 +359,12 @@ int SaveScena(void)
 	POINTER(script_vars[ScrPool8_CurrentPers], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* sprites_list */
-	for(i = 0;i < MAX_SPRITES;i++)
-	{
+	for (i = 0; i < MAX_SPRITES; i++) {
 		POINTER(sprites_list[i], scratch_mem1, 1, 1, CGA_SAVE_SPRITES_OFS);
 	}
 
 	/* doors list */
-	for(i = 0;i < MAX_DOORS;i++)
-	{
+	for (i = 0; i < MAX_DOORS; i++) {
 		POINTER(doors_list[i], arpla_data, 1, 1, CGA_SAVE_ARPLA_OFS);
 	}
 
@@ -398,8 +383,7 @@ int SaveScena(void)
 
 	/* script_stack */
 	/*TODO: FIX ME: original stack works in reverse order (from higher address to lower)*/
-	for(i = 0;i < 5*2;i++)
-	{
+	for (i = 0; i < 5 * 2; i++) {
 		POINTER(script_stack[i], templ_data, 1, 1, CGA_SAVE_TEMPL_OFS);
 	}
 
@@ -442,8 +426,7 @@ int SaveScena(void)
 	UBYTE(zero);
 
 	/* the wall doors state */
-	for(i = 0;i < 2;i++)
-	{
+	for (i = 0; i < 2; i++) {
 		thewalldoor_t *door = &the_wall_doors[i];
 		UBYTE(door->height);
 		UBYTE(door->width);
@@ -459,8 +442,7 @@ int SaveScena(void)
 	UBYTE(zero);
 
 	/* dirty_rects */
-	for(i = 0;i < MAX_DIRTY_RECT;i++)
-	{
+	for (i = 0; i < MAX_DIRTY_RECT; i++) {
 		dirty_rect_t *dr = &dirty_rects[i];
 		UBYTE(dr->kind);
 		USHORT(dr->offs);
@@ -471,8 +453,7 @@ int SaveScena(void)
 	}
 
 	/* inventory_items */
-	for(i = 0;i < MAX_INV_ITEMS;i++)
-	{
+	for (i = 0; i < MAX_INV_ITEMS; i++) {
 		/*TODO: properly serialize this*/
 		BYTES(&inventory_items[i], sizeof(item_t));
 	}
@@ -491,8 +472,7 @@ int SaveScena(void)
 	USHORT(fight_pers_ofs);
 
 	/* pers_list */
-	for(i = 0;i < PERS_MAX;i++)
-	{
+	for (i = 0; i < PERS_MAX; i++) {
 		/*TODO: properly serialize this*/
 		BYTES(&pers_list[i], sizeof(pers_t));
 	}
@@ -568,7 +548,7 @@ int SaveScena(void)
 	USHORT(next_ticks2);
 
 	/* padding */
-	for(i = 0;i < 7;i++) USHORT(zero);
+	for (i = 0; i < 7; i++) USHORT(zero);
 
 	/* script_byte_vars */
 	BYTES(&script_byte_vars, sizeof(script_byte_vars));
@@ -580,12 +560,12 @@ int SaveScena(void)
 	BYTES(frontbuffer, 0x3FFF);
 	BYTES(backbuffer, 0x3FFF);
 
-	#undef BYTES
-	#undef UBYTE
-	#undef SBYTE
-	#undef USHORT
-	#undef SSHORT
-	#undef POINTER
+#undef BYTES
+#undef UBYTE
+#undef SBYTE
+#undef USHORT
+#undef SSHORT
+#undef POINTER
 
 	close(f);
 	script_byte_vars.game_paused = 0;
