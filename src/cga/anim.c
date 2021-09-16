@@ -4,7 +4,7 @@
 #include "room.h"
 #include "sound.h"
 
-unsigned char far *anima_end_ofs;
+unsigned char *anima_end_ofs;
 
 unsigned char last_anim_y = 0;
 unsigned char last_anim_x = 0;
@@ -21,7 +21,7 @@ unsigned int dot_effect_delay;
 
 extern unsigned short cpu_speed_delay;
 
-extern unsigned char *SeekToEntry(unsigned char far *bank, unsigned int num, unsigned char far **end);
+extern unsigned char *SeekToEntry(unsigned char *bank, unsigned int num, unsigned char **end);
 extern void LoadLutinSprite(unsigned int lutidx);
 
 void GetScratchBuffer(unsigned char mode) {
@@ -168,7 +168,7 @@ void PlayAnimCore(unsigned char **panim) {
 		dot_effect_delay = 500;
 		count2 = mode & 7;
 		while (count2--) {
-			unsigned char far *sprite;
+			unsigned char *sprite;
 			unsigned char sprw, sprh;
 			unsigned char x, y;
 			signed char dx, dy;

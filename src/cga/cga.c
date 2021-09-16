@@ -100,8 +100,8 @@ void CGA_SwapRealBackBuffer(void) {
 	unsigned int i;
 	unsigned short *s, *d;
 	WaitVBlank();
-	s = (unsigned short far *)CGA_SCREENBUFFER;
-	d = (unsigned short far *)backbuffer;
+	s = (unsigned short *)CGA_SCREENBUFFER;
+	d = (unsigned short *)backbuffer;
 	for (i = 0; i < sizeof(backbuffer) / 2; i++) {
 		unsigned short t = *s;
 		*s++ = *d;
