@@ -47,8 +47,6 @@ unsigned char **spot_sprite;
 
 unsigned char zone_palette;
 
-unsigned char zone_spr_index;
-
 unsigned int zsprite_draw_ofs;
 unsigned char zsprite_w;
 unsigned char zsprite_h;

@@ -5,7 +5,7 @@
 #include "decompr.h"
 
 extern void AskDisk2(void);
-extern int LoadSplash(char *filename);
+extern int LoadSplash(const char *filename);
 
 /*
 Get bank entry
@@ -37,7 +37,7 @@ unsigned char *SeekToEntryW(unsigned char *bank, unsigned int num, unsigned char
 	return p + 2;
 }
 
-unsigned int LoadFile(char *filename, unsigned char *buffer) {
+unsigned int LoadFile(const char *filename, unsigned char *buffer) {
 	int f;
 	int rlen;
 	f = open(filename, O_RDONLY | O_BINARY);
