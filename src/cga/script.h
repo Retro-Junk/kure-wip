@@ -79,7 +79,7 @@ typedef struct script_byte_vars_t {
 	unsigned char byte_179EF;       /* 39 */
 	unsigned char quest_item_ofs;   /* 3A */
 	unsigned char byte_179F1;       /* 3B */
-	unsigned char byte_179F2;       /* 3C */
+	unsigned char fight_status;     /* 3C */
 	unsigned char byte_179F3;       /* 3D */
 	unsigned char trade_done;       /* 3E */
 	unsigned char byte_179F5;       /* 3F */

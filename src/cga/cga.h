@@ -101,4 +101,7 @@ void CGA_HideShatterFall(unsigned char *screen, unsigned char *source, unsigned 
 
 void CGA_TraceLine(unsigned int sx, unsigned int ex, unsigned int sy, unsigned int ey, unsigned char *source, unsigned char *target);
 
+void CGA_ZoomImage(unsigned char *pixels, unsigned char w, unsigned char h, unsigned char nw, unsigned char nh, unsigned char *target, unsigned int ofs);
+void CGA_AnimZoomIn(unsigned char *pixels, unsigned char w, unsigned char h, unsigned char *target, unsigned int ofs);
+
 #endif
