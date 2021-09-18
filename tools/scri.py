@@ -143,6 +143,20 @@ def SH_IconDraw(block, offs, line, disp):
 	offs += 2
 	return offs, line + disp["m"] + " icon:0x%X, coords:0x%X (%d:%d)"%(index, coords, (coords % 256) * 4, coords // 256)
 
+def SH_IconZoom(block, offs, line, disp):
+	index = block[offs];
+	offs += 1
+	if index == 255:
+		return offs, line + disp["m"] + " Current"
+	coords = (block[offs + 1] << 8) | block[offs];
+	offs += 2
+
+	zoomw = block[offs]
+	zoomh = block[offs + 1]
+	offs += 2
+
+	return offs, line + disp["m"] + " icon:0x%X, coords:0x%X (%d:%d) zoom:%d,%d"%(index, coords, (coords % 256) * 4, coords // 256, zoomw, zoomh)
+
 def SH_DrawText(block, offs, line, disp):
 	index = block[offs];
 	offs += 1
@@ -228,8 +242,10 @@ def SH_RoomSprite(block, offs, line, disp):
 
 
 script_handlers = {
-0x01:{"m":"AspirantInventory"},
+0x01:{"m":"KindAspirantTrade"},
+0x02:{"m":"RudeAspirantTrade"},
 0x03:{"m":"DrawDesciForItem", "h":SH_Byte},     # box with item and its name
+0x04:{"m":"StealZapstik"},
 0x05:{"m":"DrawPortraitLiftRight", "h":SH_IconDraw},
 0x06:{"m":"DrawPortraitLiftLeft", "h":SH_IconDraw},
 0x07:{"m":"DrawPortraitLiftDown", "h":SH_IconDraw},
@@ -239,6 +255,7 @@ script_handlers = {
 0x0C:{"m":"DrawPortraitArc", "h":SH_IconDraw},
 0x0D:{"m":"DrawPortraitDotEffect", "h":SH_IconDraw},
 0x0E:{"m":"DrawPortraitZoomIn", "h":SH_IconDraw},
+0x10:{"m":"DrawPortraitZoomed", "h":SH_IconZoom},
 0x11:{"m":"DrawRoomObject", "h":SH_RoomSprite},
 0x12:{"m":"Chain", "h":SH_Word},				# jump to another subroutine
 0x13:{"m":"RedrawRoomStatics", "h":SH_Byte},
@@ -269,6 +286,8 @@ script_handlers = {
 0x2E:{"m":"PromptWait"},
 0x2F:{"m":"TakePersonsItem"},
 0x30:{"m":"Fight"},
+0x31:{"m":"Fight2"},
+0x32:{"m":"FightWin"},
 0x33:{"m":"Jump", "h":SH_Call},
 0x34:{"m":"Call", "h":SH_Call},
 0x35:{"m":"Ret"},
@@ -300,17 +319,22 @@ script_handlers = {
 0x51:{"m":"ItemTrade"},
 0x52:{"m":"RefreshSpritesData"},
 0x53:{"m":"FindInvItem", "h":SH_FindInvItem},
+0x54:{"m":"DotFadeRoom"},
 0x55:{"m":"DrawRoomItemsIndicator"},
+0x56:{"m":"MorphRoom98"},
 0x57:{"m":"ShowCharacterSprite", "h":SH_Triplet},
 0x58:{"m":"DrawCharacterSprite", "h":SH_Triplet},
 0x59:{"m":"BlitSpritesToBackBuffer"},
 0x5A:{"m":"SelectPalette"},
+0x5B:{"m":"TheEnd"},
 0x5C:{"m":"ClearInventory"},
 0x5D:{"m":"DropWeapons"},
 0x5E:{"m":"SelectTempPalette", "h":SH_Byte},
 0x5F:{"m":"DrawRoomObjectBack", "h":SH_RoomSprite},
+0x60:{"m":"ReviveCadaver"},
 0x61:{"m":"DrawPersonBubbleDialog", "h":SH_TextIndex, "t":diali},
 0x62:{"m":"PsiReaction", "h":SH_Byte},
+0x63:{"m":"LiftSpot6"},
 0x64:{"m":"DrawBoxAroundSpot"},
 0x65:{"m":"DeProfundisMovePlatform", "h":SH_Byte},
 0x66:{"m":"DeProfundisRideToExit"},
