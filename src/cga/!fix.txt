@@ -21,6 +21,11 @@ Known bugs (not the original ones):
 20. CANTREPRO -- Can't leave left Victory of The Faith room?
 21. Zorq trader at TMO is broken again. Now refuses to trade even when have a skull.
 22. In Who Will Be Saved raised hand's part is not drawn after reentering the room? (see note in DrawRoomStaticObject)
+23. Mummy portrait frame is wider than it should?
+24. Arm of femzorq in Ablutions drawn detached?
+25. Right door in The Wall leaves trail when opens
+26. Vorts carrying out dead zorq body animation played twice in some rooms (The Ring)?
+27. Sometimes wandering zorq appear then immediately vanish?
 
 Rooms done so far:
 DeProf - solvable (with a rope or psi)
@@ -43,3 +48,4 @@ Original game bugs:
 3. Trade with Skull Trader while having only a skull will cause lost of the skull?
 4. Entering The Wall's side doors then return back leaves strange black patch on the right half-open door
 5. Some graphics objects seems to be missing a number of pixels on first or last line (up right of trapdoor in The Noose, bottom right in the cavern)
+6. When zap-killed by zorq, its zoomed portrait is drawn, but then immediately replaced with game over sequence
