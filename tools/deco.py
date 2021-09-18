@@ -107,9 +107,15 @@ def ExtractResources(mod_data, index, first_res):
 		print("Found resources table at 0x%X"%resofs)
 		restable = []
 		while mz.image[resofs] != ord('$'):
-			resname, reso, ress = struct.unpack_from("<10sHH", mz.image, resofs)
+			resname = struct.unpack_from("10s", mz.image, resofs)[0]
+			resofs += 5 + 1 + 3 + 1
+			# work around malformed resource entry in the US release
+			while not b"\0" in resname:
+				resname += struct.unpack_from("1s", mz.image, resofs)[0]
+				resofs += 1
+			reso, ress = struct.unpack_from("<HH", mz.image, resofs)
+			resofs += 4
 			restable.append((resname.split(b"\0")[0].decode("ascii"), ress*16 + reso))
-			resofs += 5 + 1 + 3 + 1 + 4
 		restable = sorted(restable, key=lambda r:r[1])
 		#print(restable)
 		for i in range(len(restable)):
@@ -130,6 +136,11 @@ def dump_pxi_file(filename, extractres=False):
 
 	for i in range(len(mod_offs)):
 		mod_ofs = mod_offs[i]
+		if mod_ofs >= len(filedata):
+			print("Module %d : at 0x%6X, but that is outside the file!"%(i, mod_ofs))
+			print("Skipped...")
+			continue
+			
 		mod_psize, mod_usize = struct.unpack_from(">II", filedata, mod_ofs)
 		mod_data = filedata[mod_ofs + 8:mod_ofs + 8 + mod_psize]
 		print("Module %d : at 0x%6X, psize = %6d, usize = %6d"%(i, mod_ofs, mod_psize, mod_usize))
@@ -140,9 +151,9 @@ def dump_pxi_file(filename, extractres=False):
 
 		if extractres:
 			if not mod_data.startswith(b"MZ"):
-				print("Module decompressed, but appears to be invalid")
+				print("Module decompressed, but is not an EXE file")
 			else:
-				ExtractResources(mod_data, i, b"ARPLA.BIN")
+				ExtractResources(mod_data, i, b"ARPLA.")
 
 def dump_bin_file(filename):
 	filedata = open(filename, "rb").read()
