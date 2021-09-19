@@ -1246,3 +1246,87 @@ void CGA_AnimZoomIn(unsigned char *pixels, unsigned char w, unsigned char h, uns
 
 	CGA_BlitAndWait(pixels, w, w, h, target, finofs);
 }
+
+/*
+Draw scaled image
+NB! tw/th specify target width/height in pixels
+*/
+void CGA_ZoomInplace(zoom_t *params, unsigned char tw, unsigned char th, unsigned char *source, unsigned char *target, unsigned int ofs) {
+	unsigned char x, y;
+
+	/*calc old/new ratio*/
+	params->scale_x = tw + 1;
+	params->xstep_l = (unsigned short)params->ew / params->scale_x;
+	params->xstep_h = (unsigned short)(((unsigned short)params->ew % params->scale_x) << 8) / params->scale_x;
+
+	params->scale_y = th + 1;
+	params->ystep_l = (unsigned short)params->eh / params->scale_y;
+	params->ystep_h = (unsigned short)(((unsigned short)params->eh % params->scale_y) << 8) / params->scale_y;
+
+	params->yval_l = 0;
+	params->yval_h = 0;
+
+	for (y = params->scale_y;;) {
+		unsigned int oofs = ofs;
+		unsigned char *pixels = params->pixels + params->yval_l * params->ow;
+		unsigned char sc = 4 - params->xbase;
+		/*left partial pixel*/
+		unsigned char pix = source[ofs] >> (sc * 2);
+
+		params->xval_l = 0;
+		params->xval_h = 0;
+		params->fw = 0;
+
+		for (x = params->scale_x;;) {
+			unsigned char p = pixels[params->xval_l / 4] << ((params->xval_l % 4) * 2);
+			pix = (pix << 2) | (p >> 6);
+			if (--sc == 0) {
+				/*inner full pixel*/
+				target[ofs] = pix;
+				ofs++;
+				params->fw++;
+				sc = 4;
+			}
+			params->xval_l += params->xstep_l + ((params->xval_h + params->xstep_h) >> 8);
+			params->xval_h += params->xstep_h;
+
+			if (x == 0)
+				break;
+			if (--x == 0)
+				params->xval_l = params->ew;
+		}
+
+		/*right partial pixel*/
+		target[ofs] = (source[ofs] & ~(0xFF << (sc * 2))) | (pix << (sc * 2));
+		ofs++;
+		params->fw++;
+
+		/*ofs -= params->fw;*/
+		ofs = oofs;
+
+		ofs ^= CGA_ODD_LINES_OFS;
+		if ((ofs & CGA_ODD_LINES_OFS) == 0)
+			ofs += CGA_BYTES_PER_LINE;
+
+		params->yval_l += params->ystep_l + ((params->yval_h + params->ystep_h) >> 8);
+		params->yval_h += params->ystep_h;
+
+		if (y == 0)
+			break;
+		if (--y == 0)
+			params->yval_l = params->eh;
+	}
+}
+
+void CGA_ZoomInplaceXY(unsigned char *pixels, unsigned char w, unsigned char h, unsigned char nw, unsigned char nh, unsigned int x, unsigned int y, unsigned char *target) {
+	zoom_t zoom;
+
+	zoom.pixels = pixels;
+	zoom.ow = w;
+	zoom.oh = h;
+	zoom.ew = (w * 4) - 1;
+	zoom.eh = h - 1;
+	zoom.xbase = x % 4;
+
+	CGA_ZoomInplace(&zoom, nw, nh, target, target, CGA_CalcXY(x, y));
+}

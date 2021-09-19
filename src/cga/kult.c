@@ -161,6 +161,9 @@ void ExitGame(void) {
 
 jmp_buf restart_jmp;
 
+#ifdef DEBUG_ENDING
+extern TheEnd(void);
+#endif
 
 void main(void) {
 	unsigned char c;
@@ -265,6 +268,12 @@ restart:;
 
 	/* Initialize cursor backup */
 	ProcessInput();
+
+#ifdef DEBUG_ENDING
+	script_byte_vars.game_paused = 5;
+	TheEnd();
+	for (;;) ;
+#endif
 
 	/* Main game loop */
 	GameLoop(frontbuffer);
