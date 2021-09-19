@@ -1,5 +1,6 @@
 #include <io.h>
 #include <fcntl.h>
+#include <setjmp.h>
 #include "common.h"
 #include "savegame.h"
 #include "resdata.h"
@@ -7,23 +8,6 @@
 #include "cga.h"
 #include "room.h"
 #include "dialog.h"
-
-void SaveRestartGame(void) {
-	/*TODO*/
-}
-
-void RestartGame(void) {
-	/*
-	while(!LoadFile("CLEAR.BIN", save_start))
-	    AskDisk2();
-	*/
-
-	script_byte_vars.cur_spot_flags = 0xFF;
-	script_byte_vars.load_flag = 2;
-	/*Restart();*/
-
-	/*TODO*/
-}
 
 #define CGA_SAVE_BEG_OFS 0x751E
 #define CGA_SAVE_END_OFS 0x9D5D
@@ -56,27 +40,11 @@ void RestartGame(void) {
 #define READ(buffer, size) \
 	rlen = read(f, buffer, size); if(rlen != size) goto error;
 
-int LoadScena(void) {
-	int f;
+int ReadSaveData(int f, int clean) {
 	int rlen;
 	unsigned short zero = 0;
 	unsigned char *p;
 	int i;
-
-	script_byte_vars.game_paused = 1;
-
-
-	f = open("SCENAx.BIN", O_RDONLY | O_BINARY);
-	if (f == -1) {
-		script_byte_vars.game_paused = 0;
-		return 1;   /*error*/
-	}
-	/*
-	Save format:
-	  vars memory (751E-9D5D)
-	  frontbuffer (0x3FFF bytes)
-	  backbuffer  (0x3FFF bytes)
-	*/
 
 #define BYTES(buffer, size) READ(buffer, size)
 #define UBYTE(variable) { unsigned char temp_v; READ(&temp_v, 1); variable = temp_v; }
@@ -295,13 +263,15 @@ int LoadScena(void) {
 	/* zones_data */
 	BYTES(zones_data, RES_ZONES_MAX);
 
-	/* screen data */
-	BYTES(backbuffer, 0x3FFF);
+	if (clean == 0) {
+		/* screen data */
+		BYTES(backbuffer, 0x3FFF);
 
-	CGA_BackBufferToRealFull();
-	SelectPalette();
+		CGA_BackBufferToRealFull();
+		SelectPalette();
 
-	BYTES(backbuffer, 0x3FFF);
+		BYTES(backbuffer, 0x3FFF);
+	}
 
 #undef BYTES
 #undef UBYTE
@@ -310,34 +280,17 @@ int LoadScena(void) {
 #undef SSHORT
 #undef POINTER
 
-	/*re-initialize sprites list*/
-	BackupSpotsImages();
-
-	close(f);
-	script_byte_vars.game_paused = 0;
 	return 0;
 
 error:;
-	close(f);
-	script_byte_vars.game_paused = 0;
 	return 1;
 }
 
-int SaveScena(void) {
-	int f;
+int WriteSaveData(int f, int clean) {
 	int wlen;
 	unsigned short zero = 0;
 	unsigned char *p;
 	int i;
-
-	script_byte_vars.game_paused = 1;
-	BlitSpritesToBackBuffer();
-
-	f = open("SCENAx.BIN", O_CREAT | O_WRONLY | O_BINARY);
-	if (f == -1) {
-		script_byte_vars.game_paused = 0;
-		return 1;   /*error*/
-	}
 
 #define BYTES(buffer, size) WRITE(buffer, size)
 #define UBYTE(variable) { unsigned char temp_v = variable; WRITE(&temp_v, 1); }
@@ -556,9 +509,11 @@ int SaveScena(void) {
 	/* zones_data */
 	BYTES(zones_data, RES_ZONES_MAX);
 
-	/* screen data */
-	BYTES(frontbuffer, 0x3FFF);
-	BYTES(backbuffer, 0x3FFF);
+	if (clean == 0) {
+		/* screen data */
+		BYTES(frontbuffer, 0x3FFF);
+		BYTES(backbuffer, 0x3FFF);
+	}
 
 #undef BYTES
 #undef UBYTE
@@ -567,12 +522,95 @@ int SaveScena(void) {
 #undef SSHORT
 #undef POINTER
 
-	close(f);
-	script_byte_vars.game_paused = 0;
 	return 0;
 
 error:;
+	return 1;
+}
+
+int LoadScena(void) {
+	int f;
+	int res;
+
+	script_byte_vars.game_paused = 1;
+
+	f = open("SCENAx.BIN", O_RDONLY | O_BINARY);
+	if (f == -1) {
+		script_byte_vars.game_paused = 0;
+		return 1;   /*error*/
+	}
+	/*
+	Save format:
+	  vars memory (751E-9D5D)
+	  frontbuffer (0x3FFF bytes)
+	  backbuffer  (0x3FFF bytes)
+	*/
+
+	res = ReadSaveData(f, 0);
+
+	if (res == 0) {
+		/*re-initialize sprites list*/
+		BackupSpotsImages();
+	}
+
 	close(f);
 	script_byte_vars.game_paused = 0;
-	return 1;
+	return res;
+}
+
+int SaveScena(void) {
+	int f;
+	int res;
+
+	script_byte_vars.game_paused = 1;
+	BlitSpritesToBackBuffer();
+
+	f = open("SCENAx.BIN", O_CREAT | O_WRONLY | O_BINARY);
+	if (f == -1) {
+		script_byte_vars.game_paused = 0;
+		return 1;   /*error*/
+	}
+
+	res = WriteSaveData(f, 0);
+
+	close(f);
+	script_byte_vars.game_paused = 0;
+	return res;
+}
+
+void SaveRestartGame(void) {
+	int f;
+
+	f = open("CLEARx.BIN", O_CREAT | O_WRONLY | O_BINARY);
+	if (f == -1) {
+		return;   /*error*/
+	}
+
+	WriteSaveData(f, 1);
+
+	close(f);
+	return;
+}
+
+extern jmp_buf restart_jmp;
+extern void AskDisk2(void);
+
+void RestartGame(void) {
+	int f;
+	int res;
+
+	for (;; AskDisk2()) {
+		f = open("CLEARx.BIN", O_RDONLY | O_BINARY);
+		if (f != -1) {
+			res = ReadSaveData(f, 1);
+			close(f);
+			if (res == 0)
+				break;
+		}
+	}
+
+	script_byte_vars.cur_spot_flags = 0xFF;
+	script_byte_vars.load_flag = 2;
+
+	longjmp(restart_jmp, 1);
 }

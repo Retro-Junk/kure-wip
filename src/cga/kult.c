@@ -3,6 +3,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <setjmp.h>
 
 #include "common.h"
 #include "decompr.h"
@@ -158,6 +159,9 @@ void ExitGame(void) {
 	exit(0);
 }
 
+jmp_buf restart_jmp;
+
+
 void main(void) {
 	unsigned char c;
 
@@ -233,6 +237,8 @@ void main(void) {
 
 	/*restart game from here*/
 restart:;
+	setjmp(restart_jmp);
+
 	Randomize();
 
 	/* Set start zone */
@@ -242,12 +248,7 @@ restart:;
 	script_byte_vars.game_paused = 0;
 
 #ifdef DEBUG_SCRIPT
-	{
-		FILE *f = fopen(DEBUG_SCRIPT_LOG, "wt+");
-		if (f) {
-			fclose(f);
-		}
-	}
+	unlink(DEBUG_SCRIPT_LOG);
 #endif
 
 #ifdef DEBUG_SKIP_INTRO
