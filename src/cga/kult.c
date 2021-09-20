@@ -107,7 +107,7 @@ void GameLoop(unsigned char *target) {
 					goto process;
 			}
 
-			if (script_byte_vars.flag_179FB)
+			if (script_byte_vars.bvar_45)
 				continue;
 
 			the_command = Swap16(script_word_vars.next_command2);

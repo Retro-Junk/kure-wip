@@ -313,7 +313,7 @@ void AnimPortrait(unsigned char layer, unsigned char index, unsigned char delay)
 		CGA_BlitAndWait(cur_image_pixels, width, width, height, CGA_SCREENBUFFER, offs);
 		if (delay) {
 			if (ani[-1] == 37) { /*TODO: what is it?*/
-				if (script_byte_vars.byte_179F3)
+				if (script_byte_vars.bvar_3D)
 					BlinkToRed();
 				else
 					BlinkToWhite();
