@@ -26,6 +26,7 @@ Known bugs (not the original ones):
 25. Right door in The Wall leaves trail when opens
 26. Vorts carrying out dead zorq body animation played twice in some rooms (The Ring)?
 27. Sometimes wandering zorq appear then immediately vanish?
+28. Zorq sometimes briefly appear at trader's window?
 
 Rooms done so far:
 DeProf - solvable (with a rope or psi)

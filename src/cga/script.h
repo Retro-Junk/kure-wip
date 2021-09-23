@@ -12,7 +12,7 @@ enum ScriptPools {
 	ScrPool4_ZoneSpots,
 	ScrPool5_Persons,
 	ScrPool6_Inventory,
-	ScrPool7_Inventory38,
+	ScrPool7_Zapstiks,
 	ScrPool8_CurrentPers,
 	ScrPools_MAX
 };
@@ -21,7 +21,7 @@ enum ScriptPools {
 typedef struct script_byte_vars_t {
 	unsigned char zone_index;       /*  0 */
 	unsigned char zone_room;        /*  1 */
-	unsigned char bvar_02;          /*  2 */
+	unsigned char last_door;        /*  2 */
 	unsigned char cur_spot_idx;     /*  3 */
 	unsigned char the_wall_phase;   /*  4 */
 	unsigned char prev_zone_index;  /*  5 */
@@ -64,27 +64,27 @@ typedef struct script_byte_vars_t {
 	unsigned char bvar_28;          /* 28 */
 	unsigned char bvar_29;          /* 29 */
 	unsigned char bvar_2A;          /* 2A */
-	unsigned char bvar_2B;          /* 2B */ /*TODO: hand height*/
+	unsigned char hands;            /* 2B */
 	unsigned char check_used_commands; /* 2C */
 	unsigned char bvar_2D;          /* 2D */
 	unsigned char palette_index;    /* 2E */
 	unsigned char bvar_2F;          /* 2F */
 
 	unsigned char bvar_30;          /* 30 */
-	unsigned char room_items;       /* 31 */
+	unsigned char zapstiks_owned;   /* 31 */
 	unsigned char bvar_32;          /* 32 */
 	unsigned char bvar_33;          /* 33 */
 	unsigned char bvar_34;          /* 34 */
-	unsigned char bvar_35;          /* 35 */
+	unsigned char skulls_submitted; /* 35 */
 	unsigned char bvar_36;          /* 36 */
 	unsigned char bvar_37;          /* 37 */
 	unsigned char zone_area_copy;   /* 38 */
-	unsigned char bvar_39;          /* 39 */
-	unsigned char quest_item_ofs;   /* 3A */
-	unsigned char bvar_3B;          /* 3B */
+	unsigned char aspirant_flags;   /* 39 */
+	unsigned char aspirant_pers_ofs;/* 3A */
+	unsigned char steals_count;     /* 3B */
 	unsigned char fight_status;     /* 3C */
-	unsigned char bvar_3D;          /* 3D */
-	unsigned char trade_done;       /* 3E */
+	unsigned char extreme_violence; /* 3D */
+	unsigned char trade_accepted;   /* 3E */
 	unsigned char bvar_3F;          /* 3F */
 
 	unsigned char bvar_40;          /* 40 */
@@ -95,7 +95,7 @@ typedef struct script_byte_vars_t {
 	unsigned char bvar_45;          /* 45 */
 	unsigned char bvar_46;          /* 46 */
 	unsigned char game_paused;      /* 47 */
-	unsigned char trade_status;     /* 48 */
+	unsigned char skull_trader_status;/* 48 */
 	unsigned char cur_spot_flags;   /* 49 */
 	unsigned char bvar_4A;          /* 4A */
 	unsigned char bvar_4B;          /* 4B */
@@ -144,14 +144,14 @@ typedef struct script_word_vars_t {
 	unsigned short wvar_0E;             /*  E */
 	unsigned short timer_ticks2;        /* 10 */
 	unsigned short zone_obj_cmds[15 * 5];   /* 12 */
-	unsigned short next_command1;       /* A8 */
+	unsigned short next_aspirant_cmd;   /* A8 */
 	unsigned short wvar_AA;             /* AA */
 	unsigned short wvar_AC;             /* AC */
 	unsigned short wvar_AE;             /* AE */
 	unsigned short wvar_B0;             /* B0 */
 	unsigned short wvar_B2;             /* B2 */
 	unsigned short wvar_B4;             /* B4 */
-	unsigned short next_command2;       /* B6 */
+	unsigned short next_protozorqs_cmd; /* B6 */
 	unsigned short wvar_B8;             /* B8 */
 } script_word_vars_t;
 
@@ -159,19 +159,24 @@ extern void *script_vars[ScrPools_MAX];
 extern script_word_vars_t script_word_vars;
 extern script_byte_vars_t script_byte_vars;
 
-/*Trader's item*/
-#define ITEMFLG_10 0x10
+
+/*Don't trade this item*/
+#define ITEMFLG_DONTWANT 1
+#define ITEMFLG_04 0x04
+#define ITEMFLG_08 0x08
+/*Skull Trader's item*/
+#define ITEMFLG_TRADER 0x10
 /*Aspirant's item*/
-#define ITEMFLG_20 0x20
+#define ITEMFLG_ASPIR 0x20
 /*In a room?*/
-#define ITEMFLG_40 0x40
+#define ITEMFLG_ROOM 0x40
 /*In pocket?*/
-#define ITEMFLG_80 0x80
+#define ITEMFLG_OWNED 0x80
 
 /*TODO: manipulated from script, do not change*/
 typedef struct item_t {
 	unsigned char flags;
-	unsigned char flags2;
+	unsigned char area;		/*item location*/
 	unsigned char sprite;   /*item sprite index*/
 	unsigned char name;     /*item name index (relative)*/
 	unsigned short command; /*TODO: warning! in native format, check if never accessed from scripts*/
@@ -190,7 +195,7 @@ extern pers_t pers_list[PERS_MAX];
 extern unsigned char *script_stack[5 * 2];
 extern unsigned char **script_stack_ptr;
 
-extern pers_t *pers_vort_ptr;
+extern pers_t *vort_ptr;
 
 #define SPECIAL_COMMANDS_MAX 20
 extern unsigned short menu_commands_12[SPECIAL_COMMANDS_MAX];

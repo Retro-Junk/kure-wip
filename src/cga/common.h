@@ -58,7 +58,13 @@ typedef struct rect_t {
 #endif
 
 #if 1
+/*win in fights*/
 #define CHEAT
+#endif
+
+#if 1
+/*never lose to the Skull Trader*/
+#define CHEAT_TRADER
 #endif
 
 #endif

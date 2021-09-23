@@ -81,11 +81,11 @@ extern unsigned char object_hint;
 extern unsigned char command_hint;
 extern unsigned char last_command_hint;
 
-extern unsigned short next_ticks2;
-extern unsigned short next_ticks3;
-extern unsigned short next_command3;
-extern unsigned short next_ticks4;
-extern unsigned short next_command4;
+extern unsigned short next_protozorqs_ticks;
+extern unsigned short next_vorts_ticks;
+extern unsigned short next_vorts_cmd;
+extern unsigned short next_turkey_ticks;
+extern unsigned short next_turkey_cmd;
 
 #define MAX_SPRITES 16
 
@@ -106,14 +106,14 @@ extern vortanims_t *vortanims_ptr;
 
 extern turkeyanims_t turkeyanim_list[];
 extern turkeyanims_t *turkeyanims_ptr;
-extern pers_t *pers_ptr;
-extern spot_t *spot_ptr;
+extern pers_t *aspirant_ptr;
+extern spot_t *aspirant_spot;
 extern spot_t *found_spot;
 extern unsigned char **spot_sprite;
 
 extern unsigned char *lutin_mem;
 
-extern unsigned char zone_drawn;
+extern unsigned char skip_zone_transition;
 
 extern unsigned char in_de_profundis;
 
@@ -124,9 +124,9 @@ extern unsigned char zone_obj_count;
 extern unsigned char room_hint_bar_coords_x;
 extern unsigned char room_hint_bar_coords_y;
 
-extern unsigned short inv_update_time;
+extern unsigned short drops_cleanup_time;
 
-extern const unsigned char timed_seq[];
+extern const unsigned char patrol_route[];
 extern const unsigned char *timed_seq_ptr;
 
 typedef struct thewalldoor_t {
@@ -171,16 +171,16 @@ void SelectPalette(void);
 void SelectSpecificPalette(unsigned char index);
 
 unsigned char FindSpotByFlags(unsigned char mask, unsigned char value);
-unsigned char FindAndSelectSpot(unsigned char offset);
+unsigned char SelectPerson(unsigned char offset);
 
 void FindPerson(void);
 
-void UpdateZoneSpot(unsigned char index);
+void BeforeChangeZone(unsigned char index);
 void DrawRoomItemsIndicator(void);
 void DrawRoomStaticObject(unsigned char *aptr, unsigned char *rx, unsigned char *ry, unsigned char *rw, unsigned char *rh);
 void DrawRoomStatics(void);
 void RedrawRoomStatics(unsigned char index, unsigned char y_step);
-void DrawZoneObjs(void);
+void DrawPersons(void);
 void RefreshZone(void);
 void ChangeZone(unsigned char index);
 
@@ -203,13 +203,13 @@ void TheWallPhase0_DoorOpen2(void);
 void TheWallPhase1_DoorClose1(void);
 void TheWallPhase2_DoorClose2(void);
 
-void PrepareCommand1(void);
-void PrepareCommand3(void);
-void PrepareCommand4(void);
+void PrepareAspirant(void);
+void PrepareVorts(void);
+void PrepareTurkey(void);
 
-void UpdateTimedRects1(void);
-void UpdateTimedRects2(void);
-void UpdateTimedInventoryItems(void);
+void UpdateProtozorqs(void);
+void CheckGameTimeLimit(void);
+void CleanupDroppedItems(void);
 
 void ResetAllPersons(void);
 

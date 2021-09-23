@@ -42,16 +42,19 @@ struct {
 unsigned char inv_count = 0;    /*TODO: pass this as param?*/
 unsigned char inv_bgcolor = 0;  /*TODO: pass this as param?*/
 
-/*Filter items and put them inventory box, then draw it if non-empty*/
+/*
+Filter items and put them inventory box, then draw it if non-empty
+filtermask/filtervalue specify area (in high 8 bits) and flags (in lower 8 bits)
+*/
 void DrawInventoryBox(unsigned short filtermask, unsigned short filtervalue) {
 	int i;
 	unsigned char count = 0;
 	for (i = 0; i < MAX_INV_ITEMS; i++) {
-		unsigned short flags = (inventory_items[i].flags2 << 8) | inventory_items[i].flags;
+		unsigned short flags = (inventory_items[i].area << 8) | inventory_items[i].flags;
 		if ((flags & filtermask) != filtervalue)
 			continue;
 		if (count == 0) {
-			/*draw the box*/
+			/*once first valid item found, draw the box*/
 			CGA_FillAndWait(inv_bgcolor, 64 / 4, 64, CGA_SCREENBUFFER, CGA_CalcXY_p(232 / 4, 56));
 			PlaySound(20);
 		}
@@ -101,9 +104,9 @@ void OpenInventory(unsigned short filtermask, unsigned short filtervalue) {
 	CGA_RestoreImage(scratch_mem2, frontbuffer);
 	PlaySound(20);
 	switch (((item_t *)script_vars[ScrPool3_CurrentItem])->name) {
-	case 108:
-	case 115:
-	case 117:
+	case 108:	/*DAGGER*/
+	case 115:	/*SACRIFICIAL BLADE*/
+	case 117:	/*CHOPPER*/
 		script_byte_vars.bvar_63 = 1;
 		break;
 	default:

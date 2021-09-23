@@ -62,7 +62,7 @@ int ReadSaveData(int f, int clean) {
 	POINTER(script_vars[ScrPool4_ZoneSpots], zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 	POINTER(script_vars[ScrPool5_Persons], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 	POINTER(script_vars[ScrPool6_Inventory], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
-	POINTER(script_vars[ScrPool7_Inventory38], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
+	POINTER(script_vars[ScrPool7_Zapstiks], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
 	POINTER(script_vars[ScrPool8_CurrentPers], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* sprites_list */
@@ -97,8 +97,8 @@ int ReadSaveData(int f, int clean) {
 	/* padding */
 	USHORT(zero);
 
-	/* pers_vort_ptr */
-	POINTER((unsigned char *)pers_vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	/* vort_ptr */
+	POINTER((unsigned char *)vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* vortanims_ptr */
 	POINTER((unsigned char *)vortanims_ptr, vortsanim_list, 1, 1, CGA_SAVE_VORTANIMS_OFS);
@@ -106,11 +106,11 @@ int ReadSaveData(int f, int clean) {
 	/* turkeyanims_ptr */
 	POINTER((unsigned char *)turkeyanims_ptr, turkeyanim_list, 1, 1, CGA_SAVE_TURKEYANIMS_OFS);
 
-	/* pers_ptr */
-	POINTER((unsigned char *)pers_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	/* aspirant_ptr */
+	POINTER((unsigned char *)aspirant_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
-	/* spot_ptr */
-	POINTER((unsigned char *)spot_ptr, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	/* aspirant_spot */
+	POINTER((unsigned char *)aspirant_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* found_spot */
 	POINTER((unsigned char *)found_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
@@ -119,7 +119,7 @@ int ReadSaveData(int f, int clean) {
 	POINTER((unsigned char *)spot_sprite, sprites_list, sizeof(sprites_list[0]), 2, CGA_SAVE_SPRLIST_OFS);
 
 	/* timed_seq_ptr */
-	POINTER(timed_seq_ptr, timed_seq, 1, 1, CGA_SAVE_TIMEDSEQ_OFS);
+	POINTER(timed_seq_ptr, patrol_route, 1, 1, CGA_SAVE_TIMEDSEQ_OFS);
 
 	/* keep_sp */
 	/* TODO: how to save it? but it's probably useless anyway */
@@ -184,8 +184,8 @@ int ReadSaveData(int f, int clean) {
 		BYTES(&pers_list[i], sizeof(pers_t));
 	}
 
-	/* inv_update_time */
-	USHORT(inv_update_time);
+	/* drops_cleanup_time */
+	USHORT(drops_cleanup_time);
 
 	/* room_bounds_rect */
 	/*TODO: properly serialize this*/
@@ -239,20 +239,20 @@ int ReadSaveData(int f, int clean) {
 	/* menu_commands_23 */
 	BYTES(menu_commands_23, sizeof(menu_commands_23));
 
-	/* next_command3 */
-	USHORT(next_command3);
+	/* next_vorts_cmd */
+	USHORT(next_vorts_cmd);
 
-	/* next_ticks3 */
-	USHORT(next_ticks3);
+	/* next_vorts_ticks */
+	USHORT(next_vorts_ticks);
 
-	/* next_command4 */
-	USHORT(next_command4);
+	/* next_turkey_cmd */
+	USHORT(next_turkey_cmd);
 
-	/* next_ticks4 */
-	USHORT(next_ticks4);
+	/* next_turkey_ticks */
+	USHORT(next_turkey_ticks);
 
-	/* next_ticks2 */
-	USHORT(next_ticks2);
+	/* next_protozorqs_ticks */
+	USHORT(next_protozorqs_ticks);
 
 	/* padding */
 	for (i = 0; i < 7; i++) USHORT(zero);
@@ -308,7 +308,7 @@ int WriteSaveData(int f, int clean) {
 	POINTER(script_vars[ScrPool4_ZoneSpots], zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 	POINTER(script_vars[ScrPool5_Persons], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 	POINTER(script_vars[ScrPool6_Inventory], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
-	POINTER(script_vars[ScrPool7_Inventory38], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
+	POINTER(script_vars[ScrPool7_Zapstiks], inventory_items, sizeof(item_t), sizeof(item_t), CGA_SAVE_INVENTORY_OFS);
 	POINTER(script_vars[ScrPool8_CurrentPers], pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* sprites_list */
@@ -343,8 +343,8 @@ int WriteSaveData(int f, int clean) {
 	/* padding */
 	USHORT(zero);
 
-	/* pers_vort_ptr */
-	POINTER(pers_vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	/* vort_ptr */
+	POINTER(vort_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
 	/* vortanims_ptr */
 	POINTER(vortanims_ptr, vortsanim_list, 1, 1, CGA_SAVE_VORTANIMS_OFS);
@@ -352,11 +352,11 @@ int WriteSaveData(int f, int clean) {
 	/* turkeyanims_ptr */
 	POINTER(turkeyanims_ptr, turkeyanim_list, 1, 1, CGA_SAVE_TURKEYANIMS_OFS);
 
-	/* pers_ptr */
-	POINTER(pers_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
+	/* aspirant_ptr */
+	POINTER(aspirant_ptr, pers_list, 1, 1, CGA_SAVE_PERS_OFS);
 
-	/* spot_ptr */
-	POINTER(spot_ptr, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
+	/* aspirant_spot */
+	POINTER(aspirant_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
 
 	/* found_spot */
 	POINTER(found_spot, zones_data, 1, 1, CGA_SAVE_ZONES_OFS);
@@ -365,7 +365,7 @@ int WriteSaveData(int f, int clean) {
 	POINTER(spot_sprite, sprites_list, sizeof(sprites_list[0]), 2, CGA_SAVE_SPRLIST_OFS);
 
 	/* timed_seq_ptr */
-	POINTER(timed_seq_ptr, timed_seq, 1, 1, CGA_SAVE_TIMEDSEQ_OFS);
+	POINTER(timed_seq_ptr, patrol_route, 1, 1, CGA_SAVE_TIMEDSEQ_OFS);
 
 	/* keep_sp */
 	/* TODO: how to save it? but it's probably useless anyway */
@@ -430,8 +430,8 @@ int WriteSaveData(int f, int clean) {
 		BYTES(&pers_list[i], sizeof(pers_t));
 	}
 
-	/* inv_update_time */
-	USHORT(inv_update_time);
+	/* drops_cleanup_time */
+	USHORT(drops_cleanup_time);
 
 	/* room_bounds_rect */
 	/*TODO: properly serialize this*/
@@ -485,20 +485,20 @@ int WriteSaveData(int f, int clean) {
 	/* menu_commands_23 */
 	BYTES(menu_commands_23, sizeof(menu_commands_23));
 
-	/* next_command3 */
-	USHORT(next_command3);
+	/* next_vorts_cmd */
+	USHORT(next_vorts_cmd);
 
-	/* next_ticks3 */
-	USHORT(next_ticks3);
+	/* next_vorts_ticks */
+	USHORT(next_vorts_ticks);
 
-	/* next_command4 */
-	USHORT(next_command4);
+	/* next_turkey_cmd */
+	USHORT(next_turkey_cmd);
 
-	/* next_ticks4 */
-	USHORT(next_ticks4);
+	/* next_turkey_ticks */
+	USHORT(next_turkey_ticks);
 
-	/* next_ticks2 */
-	USHORT(next_ticks2);
+	/* next_protozorqs_ticks */
+	USHORT(next_protozorqs_ticks);
 
 	/* padding */
 	for (i = 0; i < 7; i++) USHORT(zero);
