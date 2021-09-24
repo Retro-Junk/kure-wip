@@ -1,5 +1,8 @@
 #include <dos.h>
 #include <conio.h>
+#ifdef __386__
+#include <i86.h>
+#endif
 #include "common.h"
 #include "input.h"
 #include "cursor.h"
@@ -17,7 +20,7 @@ unsigned char key_direction_old;
 unsigned char accell_countdown;
 unsigned int accelleration = 1;
 
-void interrupt(*old_keyboard_isr)(void);
+void (INTERRUPT *old_keyboard_isr)(void);
 
 unsigned char ReadKeyboardChar(void) {
 #ifdef DEBUG
@@ -36,7 +39,7 @@ void ClearKeyboard(void) {
 	}
 }
 
-void interrupt NullIsr(void) {
+void INTERRUPT NullIsr(void) {
 	/*nothing*/
 }
 
@@ -56,9 +59,15 @@ void SetInputButtons(unsigned char keys) {
 
 unsigned char PollMouse(void) {
 	union REGS reg;
+#ifdef __386__
+	reg.w.ax = 3;
+	int386(0x33, &reg, &reg);
+	cursor_x = reg.w.cx;
+#else
 	reg.x.ax = 3;
 	int86(0x33, &reg, &reg);
 	cursor_x = reg.x.cx;
+#endif
 	cursor_y = reg.h.dl;
 	return reg.h.bl;    /*buttons*/
 }
@@ -118,7 +127,7 @@ void ProcessInput(void) {
 	DrawCursor(frontbuffer);
 }
 
-void interrupt KeyboardIsr() {
+void INTERRUPT KeyboardIsr() {
 	unsigned char scan, strobe;
 	scan = inportb(0x60);
 	/*consume scan from kbd. controller*/
@@ -167,6 +176,35 @@ void InitInput(void) {
 	/*is mouse present?*/
 	if (getvect(0x33)) {
 		union REGS reg;
+#ifdef __386__
+		reg.w.ax = 0;
+		int386(0x33, &reg, &reg);
+		if (reg.w.ax == 0xFFFF) {
+			/*mouse detected*/
+
+			reg.w.ax = 0xF; /*set cursor speed*/
+			reg.w.cx = 16;
+			reg.w.dx = 16;
+			int386(0x33, &reg, &reg);
+
+			reg.w.ax = 7;   /*set x range*/
+			reg.w.cx = 0;
+			reg.w.dx = 303;
+			int386(0x33, &reg, &reg);
+
+			reg.w.ax = 8;   /*set y range*/
+			reg.w.cx = 0;
+			reg.w.dx = 183;
+			int386(0x33, &reg, &reg);
+
+			reg.w.ax = 4;   /*set coords*/
+			cursor_x = reg.w.cx = 10;
+			cursor_y = reg.w.dx = 10;
+			int386(0x33, &reg, &reg);
+
+			have_mouse = ~0;
+		}
+#else
 		reg.x.ax = 0;
 		int86(0x33, &reg, &reg);
 		if (reg.x.ax == 0xFFFF) {
@@ -194,6 +232,7 @@ void InitInput(void) {
 
 			have_mouse = ~0;
 		}
+#endif
 	}
 
 	if (have_mouse)

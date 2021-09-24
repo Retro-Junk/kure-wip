@@ -1,4 +1,5 @@
 #include <dos.h>
+#include <conio.h>
 #include "common.h"
 #include "sound.h"
 
@@ -12,7 +13,7 @@ typedef struct pcsample_t {
 	unsigned short freqsweep;
 } pcsample_t;
 
-#define N(x) (0xF000|x)
+#define N(x) (0xF000u|x)
 
 pcsample_t pc_samples[] = {
 	{ 64,   32,      0,   32,      0,    256,      0},

@@ -1,4 +1,8 @@
 #include <dos.h>
+#ifdef __WATCOMC__
+#include <i86.h>
+#include <conio.h>
+#endif
 #include <assert.h>
 #include <string.h>
 
@@ -49,20 +53,30 @@ unsigned char cga_pixel_flip[256] = {
   Switch to CGA 320x200x2bpp mode
 */
 void SwitchToGraphicsMode(void) {
+#ifdef __386__
 	union REGS reg;
-
+	reg.w.ax = 4;
+	int386(0x10, &reg, &reg);
+#else
+	union REGS reg;
 	reg.x.ax = 4;
 	int86(0x10, &reg, &reg);
+#endif
 }
 
 /*
   Switch to text mode
 */
 void SwitchToTextMode(void) {
+#ifdef __386__
 	union REGS reg;
-
+	reg.w.ax = 3;
+	int386(0x10, &reg, &reg);
+#else
+	union REGS reg;
 	reg.x.ax = 3;
 	int86(0x10, &reg, &reg);
+#endif
 }
 
 void WaitVBlank(void) {
@@ -158,7 +172,7 @@ Out:
 unsigned char *CGA_BackupImage(unsigned char *screen, unsigned int ofs, unsigned int w, unsigned int h, unsigned char *buffer) {
 	*(unsigned char *)(buffer + 0) = h;
 	*(unsigned char *)(buffer + 1) = w;
-	*(unsigned int *)(buffer + 2) = ofs;
+	*(unsigned short *)(buffer + 2) = ofs;
 	buffer += 4;
 	while (h--) {
 		memcpy(buffer, screen + ofs, w);
@@ -171,7 +185,7 @@ unsigned char *CGA_BackupImage(unsigned char *screen, unsigned int ofs, unsigned
 }
 
 unsigned char *CGA_BackupImageReal(unsigned int ofs, unsigned int w, unsigned int h) {
-	return CGA_BackupImage(MK_FP(CGA_BASE_SEG, 0), ofs, w, h, scratch_mem2);
+	return CGA_BackupImage(frontbuffer, ofs, w, h, scratch_mem2);
 }
 
 /*
@@ -216,15 +230,15 @@ Restore saved image to target screen buffer
 */
 void CGA_RestoreImage(unsigned char *buffer, unsigned char *target) {
 	unsigned int w, h;
-	unsigned int ofs;
+	unsigned short ofs;
 
 	if (!buffer)
 		return;
 
 	h = *(unsigned char *)(buffer + 0);
 	w = *(unsigned char *)(buffer + 1);
-	ofs = *(unsigned int *)(buffer + 2);
-	buffer += 4;    /*TODO: fix me for large int*/
+	ofs = *(unsigned short *)(buffer + 2);
+	buffer += 4;
 
 	CGA_Blit(buffer, w, w, h, target, ofs);
 }
@@ -241,14 +255,14 @@ Copy image's real screen data to backbuffer
 */
 void CGA_RefreshImageData(unsigned char *buffer) {
 	unsigned int w, h;
-	unsigned int ofs;
+	unsigned short ofs;
 
 	if (!buffer)
 		return;
 
 	h = *(unsigned char *)(buffer + 0);
 	w = *(unsigned char *)(buffer + 1);
-	ofs = *(unsigned int *)(buffer + 2);
+	ofs = *(unsigned short *)(buffer + 2);
 
 	CGA_CopyScreenBlock(CGA_SCREENBUFFER, w, h, backbuffer, ofs);
 }
@@ -260,7 +274,8 @@ NB! Line must not wrap around the edge
 void CGA_DrawVLine(unsigned int x, unsigned int y, unsigned int l, unsigned char color, unsigned char *target) {
 	unsigned int ofs;
 	/*pixels are starting from top bits of byte*/
-	unsigned int mask = ~(3 << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL));
+	/*reuse top 8 bits of mask as a pad and shifts counter*/
+	unsigned short mask = ~(3 << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL));
 	unsigned char pixel = color << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL);
 
 	mask >>= (x % CGA_PIXELS_PER_BYTE) * CGA_BITS_PER_PIXEL;
@@ -283,7 +298,8 @@ NB! Line must not wrap around the edge
 void CGA_DrawHLine(unsigned int x, unsigned int y, unsigned int l, unsigned char color, unsigned char *target) {
 	unsigned int ofs;
 	/*pixels are starting from top bits of byte*/
-	unsigned int mask = ~(3 << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL));
+	/*reuse top 8 bits of mask as a pad and shifts counter*/
+	unsigned short mask = ~(3 << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL));
 	unsigned char pixel = color << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL);
 
 	mask >>= (x % CGA_PIXELS_PER_BYTE) * CGA_BITS_PER_PIXEL;
@@ -294,6 +310,7 @@ void CGA_DrawHLine(unsigned int x, unsigned int y, unsigned int l, unsigned char
 		target[ofs] = (target[ofs] & mask) | pixel;
 		mask >>= CGA_BITS_PER_PIXEL;
 		pixel >>= CGA_BITS_PER_PIXEL;
+		/*all byte's pixels done?*/
 		if (mask == 0xFF) {
 			ofs++;
 			mask = ~(3 << ((CGA_PIXELS_PER_BYTE - 1) * CGA_BITS_PER_PIXEL));
@@ -307,7 +324,7 @@ Draw horizontal line of length l with color, add surrounding pixels (bmask, bpix
 Return next line screen offset
 NB! Length specifies byte lenght of inner segment, not amount of pixels
  */
-unsigned int CGA_DrawHLineWithEnds(unsigned int bmask, unsigned int bpix, unsigned char color, unsigned int l, unsigned char *target, unsigned int ofs) {
+unsigned int CGA_DrawHLineWithEnds(unsigned short bmask, unsigned short bpix, unsigned char color, unsigned int l, unsigned char *target, unsigned int ofs) {
 	target[ofs] = (target[ofs] & (bmask >> 8)) | (bpix >> 8);
 	memset(target + ofs + 1, color, l);
 	target[ofs + 1 + l] = (target[ofs + 1 + l] & (bmask & 255)) | (bpix & 255);

@@ -1,6 +1,8 @@
 #include <stdio.h>
-
 #include <dos.h>
+#ifdef __WATCOMC__
+#include <i86.h>
+#endif
 #include <io.h>
 #include <fcntl.h>
 #include <assert.h>
@@ -56,7 +58,11 @@ void Randomize(void) {
 	union REGS reg;
 
 	reg.h.ah = 0;
+#ifdef __386__
+	int386(0x1A, &reg, &reg);
+#else
 	int86(0x1A, &reg, &reg);
+#endif
 	rand_seed = reg.h.dl;
 	Rand();
 }

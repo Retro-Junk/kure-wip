@@ -11,7 +11,11 @@
 #define CGA_PIXELS_PER_BYTE (8 / CGA_BITS_PER_PIXEL)
 #define CGA_BYTES_PER_LINE (CGA_WIDTH / CGA_PIXELS_PER_BYTE)
 
+#ifdef __386__
+#define CGA_SCREENBUFFER ((unsigned char*)(CGA_BASE_SEG * 16))
+#else
 #define CGA_SCREENBUFFER ((unsigned char*)MK_FP(CGA_BASE_SEG, 0))
+#endif
 
 #define CGA_FONT_HEIGHT 6
 
@@ -62,7 +66,7 @@ void CGA_FillAndWait(unsigned char pixel, unsigned int w, unsigned int h, unsign
 
 void CGA_DrawVLine(unsigned int x, unsigned int y, unsigned int l, unsigned char color, unsigned char *target);
 void CGA_DrawHLine(unsigned int x, unsigned int y, unsigned int l, unsigned char color, unsigned char *target);
-unsigned int CGA_DrawHLineWithEnds(unsigned int bmask, unsigned int bpix, unsigned char color, unsigned int l, unsigned char *target, unsigned int ofs);
+unsigned int CGA_DrawHLineWithEnds(unsigned short bmask, unsigned short bpix, unsigned char color, unsigned int l, unsigned char *target, unsigned int ofs);
 
 void CGA_PrintChar(unsigned char c, unsigned char *target);
 

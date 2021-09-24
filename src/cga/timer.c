@@ -14,9 +14,9 @@ void AnimateGauss(unsigned char *target) {
 	CGA_Blit(sprite, 8, 8, 30, target, 80); /*draw to 0:4*/
 }
 
-void interrupt(*old_timer_isr)();
-
-void interrupt TimerIsr() {
+void (INTERRUPT *old_timer_isr)(void);
+               
+void INTERRUPT TimerIsr() {
 	disable();
 	script_byte_vars.timer_ticks++;
 	if (!script_byte_vars.game_paused) {

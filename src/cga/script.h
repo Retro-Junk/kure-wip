@@ -182,10 +182,6 @@ typedef struct item_t {
 	unsigned short command; /*TODO: warning! in native format, check if never accessed from scripts*/
 } item_t;
 
-#if sizeof(item_t) != 6
-#error "item_t must be 6 bytes long"
-#endif
-
 #define MAX_INV_ITEMS 63
 extern item_t inventory_items[MAX_INV_ITEMS];
 
@@ -209,7 +205,7 @@ extern unsigned char wait_delta;
 
 extern unsigned char rand_seed;
 unsigned char Rand(void);
-unsigned int RandW(void);
+unsigned short RandW(void);
 
 extern unsigned short the_command;
 
@@ -218,6 +214,6 @@ unsigned char *GetScriptSubroutine(unsigned int index);
 unsigned int RunCommand(void);
 unsigned int RunCommandKeepSp(void);
 
-unsigned int Swap16(unsigned int x);
+unsigned short Swap16(unsigned short x);
 
 #endif

@@ -225,38 +225,3 @@ void DrawMessage(unsigned char *msg, unsigned char *target) {
 	PromptWait();                                   /*wait keypress*/
 	CGA_RestoreBackupImage(target);                 /*restore screen data*/
 }
-
-#if 1
-#include <stdio.h>
-void DebugMessage(char *msg, ...) {
-	int i;
-	unsigned char c;
-	unsigned char m[256];
-	va_list ap;
-
-	va_start(ap, msg);
-	vsprintf((char *)m, msg, ap);
-	va_end(ap);
-
-	for (i = 0; m[i]; i++) {
-		c = m[i];
-		if (c >= 'A' && c <= 'Z')
-			c = 0x21 + (c - 'A');
-		else if (c >= 'a' && c <= 'z')
-			c = 0x21 + (c - 'a');
-		else if (c >= '0' && c <= '9')
-			c = 0x10 + (c - '0');
-		else if (c == ' ')
-			c = 0x20;
-		else if (c == '\n')
-			c = 0x00;
-		else
-			c = 0x1F;
-		m[i] = c;
-	}
-
-	cur_str_end = m + i;
-
-	DrawMessage(m, frontbuffer);
-}
-#endif

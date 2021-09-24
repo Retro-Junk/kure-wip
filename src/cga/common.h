@@ -1,6 +1,8 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include "platform.h"
+
 #define BE(x) (((x) >> 8) | ((x) << 8))
 #define LE16(x) (x)
 
@@ -17,10 +19,6 @@ typedef struct rect_t {
 	unsigned char sy;
 	unsigned char ey;
 } rect_t;
-
-#if sizeof(rect_t) != 4
-#error "rect_t must be 4 bytes long"
-#endif
 
 #if 0
 #define DEBUG

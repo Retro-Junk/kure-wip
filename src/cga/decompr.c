@@ -1,3 +1,5 @@
+#include <string.h>
+
 static struct {
 	unsigned char codes[256];
 	unsigned char prefix[256];

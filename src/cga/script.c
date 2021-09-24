@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <setjmp.h>
 #include "common.h"
 #include "script.h"
@@ -59,12 +60,12 @@ unsigned char Rand(void) {
 /*
 Get next random word value
 */
-unsigned int RandW(void) {
-	unsigned int r = Rand() << 8;
+unsigned short RandW(void) {
+	unsigned short r = Rand() << 8;
 	return r | Rand();
 }
 
-unsigned int Swap16(unsigned int x) {
+unsigned short Swap16(unsigned short x) {
 	return (x << 8) | (x >> 8);
 }
 
@@ -325,6 +326,23 @@ unsigned char wait_delta = 0;
 Wait for a specified number of seconds (real time) or a keypress
 */
 void Wait(unsigned char seconds) {
+#ifdef __WATCOMC__
+	time_t t;
+	time_t endtime;
+
+	seconds += wait_delta;
+	if (seconds > 127)  /*TODO: is this a check for a negative value?*/
+		seconds = 0;
+
+	time(&t);
+	endtime = t + seconds * 100;
+
+	while (buttons == 0) {
+		time(&t);
+		if (t >= endtime)
+			break;
+	}
+#else
 	struct time t;
 	unsigned int endtime;
 
@@ -344,6 +362,7 @@ void Wait(unsigned char seconds) {
 		if (current >= endtime)
 			break;
 	}
+#endif
 }
 
 /*
@@ -2982,7 +3001,7 @@ unsigned int SCR_61_DrawPersonBubbleDialog(void) {
 	return 0;
 }
 
-#if 1
+#if 0
 #include <stdio.h>
 unsigned char *DebugString(char *msg, ...) {
 	int i;

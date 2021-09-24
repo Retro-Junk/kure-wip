@@ -206,7 +206,7 @@ void DrawBoxAroundSpot(void) {
 
 	h = *(unsigned char *)(buffer + 0);
 	w = *(unsigned char *)(buffer + 1);
-	ofs = *(unsigned int *)(buffer + 2);
+	ofs = *(unsigned short *)(buffer + 2);
 
 	/*decode ofs back to x:y*/
 	/*TODO: this is CGA-only!*/
