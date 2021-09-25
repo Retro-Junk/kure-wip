@@ -19,12 +19,12 @@ Known bugs (not the original ones):
 18. FIXED -- In Who Will Be Saved, Engraving opens incorrectly (maybe related to 4)
 19. FIXED -- Some junk is draw in The Wall
 20. CANTREPRO -- Can't leave left Victory of The Faith room?
-21. Zorq trader at TMO is broken again. Now refuses to trade even when have a skull.
+21. NOTABUG -- Zorq trader at TMO is broken again. Now refuses to trade even when have a skull. (Not a bug: give him a skull first)
 22. In Who Will Be Saved raised hand's part is not drawn after reentering the room? (see note in DrawRoomStaticObject)
 23. Mummy portrait frame is wider than it should?
 24. Arm of femzorq in Ablutions drawn detached?
 25. Right door in The Wall leaves trail when opens
-26. Vorts carrying out dead zorq body animation played twice in some rooms (The Ring)?
+26. FIXED -- Vorts carrying out dead zorq body animation played twice in some rooms (The Ring)?
 27. Sometimes wandering zorq appear then immediately vanish?
 28. Zorq sometimes briefly appear at trader's window?
 
@@ -40,7 +40,6 @@ General TODOs:
 3. Remove redundant target = frontbuffer argument in calls
 4. Move all remaining CGA low-level code to cga.c
 5. Replace CGA next/prev line calculations with a macro/func
-6. Add sound playback
 
 
 Original game bugs:

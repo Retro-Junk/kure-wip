@@ -1921,6 +1921,8 @@ unsigned int SCR_30_Fight(void) {
 	win flags:
 	   1 - player win
 	   2 - player lose
+	   4 - "YOU RUN..."
+	   8 - "THE ASPIRANT STEALS EVERYTHING YOU HAVE!"
 	0x20 - "TU NUH RAY VUN IN FAY VRABLE SIT YOU AISHUN."
 	0x40 - "OUT KUM UNSER TUN."
 	0x80 - "SIT YOU ASHUN KRITI KAL FOR TOONUH RAY VUN."
@@ -2043,7 +2045,7 @@ unsigned int SCR_31_Fight2(void) {
 		pers->flags |= PERSFLG_40;
 		pers->area = 0;
 		found_spot->flags &= ~SPOTFLG_80;
-		if (pers->index == 16) {
+		if (pers->index == 16) {	/*Vort trio*/
 			pers_list[kPersVort2].area = script_byte_vars.zone_area;
 			pers_list[kPersVort2].flags = pers->flags;
 			if (script_byte_vars.zapstiks_owned == 0) {
@@ -2052,7 +2054,7 @@ unsigned int SCR_31_Fight2(void) {
 			}
 			the_command = next_vorts_cmd;
 			RunCommand();
-		} else if (pers->index == 8) {
+		} else if (pers->index == 8) {	/*Vort duo*/
 			pers_list[kPersVort3].area = script_byte_vars.zone_area;
 			pers_list[kPersVort3].flags = pers->flags;
 			if (script_byte_vars.zapstiks_owned == 0) {
@@ -2087,7 +2089,7 @@ unsigned int SCR_31_Fight2(void) {
 					break;
 				default:
 					animidx = 0;
-					fightlist = fightlist3;
+					fightlist = fightlist2;
 					fightlistsize = 26;
 				}
 
@@ -3718,7 +3720,9 @@ unsigned int CMD_13_ActivateFountain(void) {
 	return 0;
 }
 
-/*Vorts walking into the room*/
+/*
+Vorts walking into the room
+*/
 unsigned int CMD_14_VortAppear(void) {
 	/*TODO: check me*/
 	pers_list[kPersVort].area = script_byte_vars.zone_area;
@@ -3846,6 +3850,47 @@ unsigned int CMD_18_AspirantLeave(void) {
 	return 0;
 }
 
+/*
+Aspirant walking into the room
+*/
+unsigned int CMD_19_AspirantAppear(void) {
+	/*TODO: check me*/
+	static const animdesc_t anim23 = {ANIMFLG_USESPOT | 23};
+
+	PopDirtyRects(DirtyRectSprite);
+	aspirant_ptr->area = script_byte_vars.zone_area;
+	script_word_vars.next_aspirant_cmd = BE(0xA018);	/*leave*/
+	script_byte_vars.check_used_commands = 3;
+	script_byte_vars.used_commands = 0;
+	SelectPerson(script_byte_vars.aspirant_pers_ofs);
+	AnimateSpot(&anim23);
+	BlitSpritesToBackBuffer();
+	DrawPersons();
+	CGA_BackBufferToRealFull();
+	if(script_byte_vars.aspirant_flags == 5) {
+		the_command = 0xC029;
+		script_byte_vars.aspirant_flags = 0;
+		return ScriptRerun;
+	}
+	if(script_byte_vars.aspirant_flags == 6) {
+		the_command = 0xC165;
+		script_byte_vars.aspirant_flags = 0;
+		return ScriptRerun;
+	}
+	return 0;
+}
+
+/*
+Aspirant is dead
+*/
+unsigned int CMD_1A_AspirantDie(void) {
+	/*TODO: check me, unused in game?*/
+	script_byte_vars.bvar_45 = 0;
+	zone_spots[5].flags = SPOTFLG_40 | SPOTFLG_10 | SPOTFLG_2 | SPOTFLG_1;
+	script_word_vars.next_aspirant_cmd = 0;
+	DrawDeathAnim();
+	return 0;
+}
 
 /*
 Show Holo screen anim and speech
@@ -4031,8 +4076,8 @@ cmdhandler_t command_handlers[] = {
 	CMD_16_VortGone,
 	CMD_17_LootAspirantsItem,
 	CMD_18_AspirantLeave,
-	CMD_TRAP,
-	CMD_TRAP,
+	CMD_19_AspirantAppear,
+	CMD_1A_AspirantDie,
 	CMD_1B_Holo,
 	CMD_TRAP,
 	CMD_TRAP,
