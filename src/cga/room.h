@@ -12,13 +12,13 @@
 /*static room object*/
 /*TODO: manipulated from script, do not change*/
 typedef struct spot_t {
-	unsigned char sx;
-	unsigned char ex;
-	unsigned char sy;
-	unsigned char ey;
-	unsigned char flags;
-	unsigned char hint;
-	unsigned short command;
+	byte sx;
+	byte ex;
+	byte sy;
+	byte ey;
+	byte flags;
+	byte hint;
+	uint16 command;
 } spot_t;
 
 #define PERSFLAGS  0xF0
@@ -30,27 +30,27 @@ typedef struct spot_t {
 /*person*/
 /*TODO: manipulated from script, do not change*/
 typedef struct pers_t {
-	unsigned char area;     /*location*/
-	unsigned char flags;    /*flags in bits 7..4 and room index in bits 3..0*/
-	unsigned char name;     /*name index*/
-	unsigned char index;    /*animations index (in lutins_table) in bits 7..3 , spot index in bits 2..0*/
-	unsigned char item;     /*inventory item index (1-based)*/
+	byte area;     /*location*/
+	byte flags;    /*flags in bits 7..4 and room index in bits 3..0*/
+	byte name;     /*name index*/
+	byte index;    /*animations index (in lutins_table) in bits 7..3 , spot index in bits 2..0*/
+	byte item;     /*inventory item index (1-based)*/
 } pers_t;
 
 #define ANIMFLG_USESPOT 0x80
 
 typedef struct animdesc_t {
-	unsigned char index;    /*flag in bit 7, animation index in bits 6..0*/
+	byte index;    /*flag in bit 7, animation index in bits 6..0*/
 	union {
 		struct {
-			unsigned char x, y;
+			byte x, y;
 		} coords;
-		unsigned short desc;
+		uint16 desc;
 	} params;
 } animdesc_t;
 
 typedef struct vortanims_t {
-	unsigned char room;
+	byte room;
 	animdesc_t field_1;
 	animdesc_t field_4;
 	animdesc_t field_7;
@@ -58,36 +58,36 @@ typedef struct vortanims_t {
 } vortanims_t;
 
 typedef struct turkeyanims_t {
-	unsigned char room;
+	byte room;
 	animdesc_t field_1;
 	animdesc_t field_4;
 } turkeyanims_t;
 
-extern unsigned char scratch_mem1[8010];
-extern unsigned char *scratch_mem2;
+extern byte scratch_mem1[8010];
+extern byte *scratch_mem2;
 
 extern rect_t room_bounds_rect;
 
-extern unsigned char last_object_hint;
-extern unsigned char object_hint;
-extern unsigned char command_hint;
-extern unsigned char last_command_hint;
+extern byte last_object_hint;
+extern byte object_hint;
+extern byte command_hint;
+extern byte last_command_hint;
 
-extern unsigned short next_protozorqs_ticks;
-extern unsigned short next_vorts_ticks;
-extern unsigned short next_vorts_cmd;
-extern unsigned short next_turkey_ticks;
-extern unsigned short next_turkey_cmd;
+extern uint16 next_protozorqs_ticks;
+extern uint16 next_vorts_ticks;
+extern uint16 next_vorts_cmd;
+extern uint16 next_turkey_ticks;
+extern uint16 next_turkey_cmd;
 
 #define MAX_SPRITES 16
 
-extern unsigned char *sprites_list[MAX_SPRITES];
+extern byte *sprites_list[MAX_SPRITES];
 
 #define MAX_DOORS 5
 
-extern unsigned char *doors_list[MAX_DOORS];
+extern byte *doors_list[MAX_DOORS];
 
-extern unsigned char zone_palette;
+extern byte zone_palette;
 
 extern spot_t *zone_spots;
 extern spot_t *zone_spots_end;
@@ -101,91 +101,91 @@ extern turkeyanims_t *turkeyanims_ptr;
 extern pers_t *aspirant_ptr;
 extern spot_t *aspirant_spot;
 extern spot_t *found_spot;
-extern unsigned char **spot_sprite;
+extern byte **spot_sprite;
 
-extern unsigned char *lutin_mem;
+extern byte *lutin_mem;
 
-extern unsigned char skip_zone_transition;
+extern byte skip_zone_transition;
 
-extern unsigned char in_de_profundis;
+extern byte in_de_profundis;
 
-extern unsigned char zone_name;
-extern unsigned char room_hint_bar_width;
-extern unsigned char zone_spr_index;
-extern unsigned char zone_obj_count;
-extern unsigned char room_hint_bar_coords_x;
-extern unsigned char room_hint_bar_coords_y;
+extern byte zone_name;
+extern byte room_hint_bar_width;
+extern byte zone_spr_index;
+extern byte zone_obj_count;
+extern byte room_hint_bar_coords_x;
+extern byte room_hint_bar_coords_y;
 
-extern unsigned short drops_cleanup_time;
+extern uint16 drops_cleanup_time;
 
-extern const unsigned char patrol_route[];
-extern const unsigned char *timed_seq_ptr;
+extern const byte patrol_route[];
+extern const byte *timed_seq_ptr;
 
 typedef struct thewalldoor_t {
-	unsigned char   height;
-	unsigned char   width;
+	byte   height;
+	byte   width;
 	unsigned int    pitch;
 	unsigned int    offs;
-	unsigned char   *pixels;
+	byte   *pixels;
 } thewalldoor_t;
 
 extern thewalldoor_t the_wall_doors[2];
 
-int IsInRect(unsigned char x, unsigned char y, rect_t *rect);
+int IsInRect(byte x, byte y, rect_t *rect);
 int IsCursorInRect(rect_t *rect);
 void SelectSpotCursor(void);
 
-void CheckHotspots(unsigned char m, unsigned char v);
+void CheckHotspots(byte m, byte v);
 
 void AnimateSpot(const animdesc_t *info);
-unsigned char *LoadPuzzlToScratch(unsigned char index);
+byte *LoadPuzzlToScratch(byte index);
 
 void DrawObjectHint(void);
-void ShowObjectHint(unsigned char *target);
+void ShowObjectHint(byte *target);
 void DrawCommandHint(void);
-void ShowCommandHint(unsigned char *target);
+void ShowCommandHint(byte *target);
 
-void DrawCharacterSprite(unsigned char spridx, unsigned char x, unsigned char y, unsigned char *target);
-char DrawZoneAniSprite(rect_t *rect, unsigned int index, unsigned char *target);
+void DrawCharacterSprite(byte spridx, byte x, byte y, byte *target);
+char DrawZoneAniSprite(rect_t *rect, unsigned int index, byte *target);
 
-void DrawHintsAndCursor(unsigned char *target);
+void DrawHintsAndCursor(byte *target);
 
 void DrawTheWallDoors(void);
-void MergeSpritesData(unsigned char *target, unsigned int pitch, unsigned char *source, unsigned int w, unsigned int h);
-void MergeSpritesDataFlip(unsigned char *target, unsigned int pitch, unsigned char *source, unsigned int w, unsigned int h);
+void MergeSpritesData(byte *target, unsigned int pitch, byte *source, unsigned int w, unsigned int h);
+void MergeSpritesDataFlip(byte *target, unsigned int pitch, byte *source, unsigned int w, unsigned int h);
 
 void RefreshSpritesData(void);
 void BlitSpritesToBackBuffer(void);
-unsigned char *BackupSpotImage(spot_t *spot, unsigned char **spotback, unsigned char *buffer);
+byte *BackupSpotImage(spot_t *spot, byte **spotback, byte *buffer);
 void BackupSpotsImages(void);
 
 void SelectPalette(void);
-void SelectSpecificPalette(unsigned char index);
+void SelectSpecificPalette(byte index);
 
-unsigned char FindSpotByFlags(unsigned char mask, unsigned char value);
-unsigned char SelectPerson(unsigned char offset);
+byte FindSpotByFlags(byte mask, byte value);
+byte SelectPerson(byte offset);
 
 void FindPerson(void);
 
-void BeforeChangeZone(unsigned char index);
+void BeforeChangeZone(byte index);
 void DrawRoomItemsIndicator(void);
-void DrawRoomStaticObject(unsigned char *aptr, unsigned char *rx, unsigned char *ry, unsigned char *rw, unsigned char *rh);
+void DrawRoomStaticObject(byte *aptr, byte *rx, byte *ry, byte *rw, byte *rh);
 void DrawRoomStatics(void);
-void RedrawRoomStatics(unsigned char index, unsigned char y_step);
+void RedrawRoomStatics(byte index, byte y_step);
 void DrawPersons(void);
 void RefreshZone(void);
-void ChangeZone(unsigned char index);
+void ChangeZone(byte index);
 
-void DrawSpots(unsigned char *target);
-void AnimateSpots(unsigned char *target);
+void DrawSpots(byte *target);
+void AnimateSpots(byte *target);
 
-unsigned char FindInitialSpot(void);
-void AnimRoomDoorOpen(unsigned char index);
-void AnimRoomDoorClose(unsigned char index);
+byte FindInitialSpot(void);
+void AnimRoomDoorOpen(byte index);
+void AnimRoomDoorClose(byte index);
 
-unsigned int GetPuzzlSprite(unsigned char index, unsigned char x, unsigned char y, unsigned int *w, unsigned int *h, unsigned int *ofs);
+unsigned int GetPuzzlSprite(byte index, byte x, byte y, unsigned int *w, unsigned int *h, unsigned int *ofs);
 
-void BounceCurrentItem(unsigned char flags, unsigned char y);
+void BounceCurrentItem(byte flags, byte y);
 
 void BackupScreenOfSpecialRoom(void);
 void RestoreScreenOfSpecialRoom(void);

@@ -1,3 +1,4 @@
+#include "common.h"
 #include "resdata.h"
 
-unsigned char templ_data[RES_TEMPL_MAX];
+byte templ_data[RES_TEMPL_MAX];

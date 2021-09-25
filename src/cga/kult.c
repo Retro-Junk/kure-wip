@@ -24,7 +24,7 @@
 #include "dialog.h"
 #include "menu.h"
 
-unsigned short cpu_speed_delay;
+uint16 cpu_speed_delay;
 
 /*
 Prompt user to insert disk #2 to any drive
@@ -47,7 +47,7 @@ int LoadSplash(const char *filename) {
 }
 
 unsigned int BenchmarkCpu(void) {
-	unsigned char t;
+	byte t;
 	unsigned int cycles = 0;
 	for (t = script_byte_vars.timer_ticks; t == script_byte_vars.timer_ticks;) ;
 	for (t = script_byte_vars.timer_ticks; t == script_byte_vars.timer_ticks;) cycles++;
@@ -73,7 +73,7 @@ void TRAP() {
 }
 
 /* Main Game Loop */
-void GameLoop(unsigned char *target) {
+void GameLoop(byte *target) {
 	for (;;) {
 		AnimateSpots(target);
 
@@ -172,7 +172,7 @@ extern TheEnd(void);
 #endif
 
 void main(void) {
-	unsigned char c;
+	byte c;
 
 	SwitchToGraphicsMode();
 

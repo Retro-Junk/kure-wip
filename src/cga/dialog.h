@@ -12,12 +12,12 @@ enum DirtyRectKind {
 };
 
 typedef struct dirty_rect_t {
-	unsigned char kind;
+	byte kind;
 	unsigned int offs;
-	unsigned char height;
-	unsigned char width;
-	unsigned char y;        /*for DirtyRectBubble this is spike offs*/
-	unsigned char x;
+	byte height;
+	byte width;
+	byte y;        /*for DirtyRectBubble this is spike offs*/
+	byte x;
 } dirty_rect_t;
 
 #define MAX_DIRTY_RECT 10
@@ -33,17 +33,17 @@ extern dirty_rect_t *last_dirty_rect;
 #define SPIKE_BUBRIGHT 0xC0
 #define SPIKE_BUBLEFT  0xE0
 
-void AddDirtyRect(unsigned char kind, unsigned char x, unsigned char y, unsigned char w, unsigned char h, unsigned int offs);
-void GetDirtyRectAndFree(int index, unsigned char *kind, unsigned char *x, unsigned char *y, unsigned char *w, unsigned char *h, unsigned int *offs);
-void GetDirtyRectAndSetSprite(int index, unsigned char *kind, unsigned char *x, unsigned char *y, unsigned char *w, unsigned char *h, unsigned int *offs);
+void AddDirtyRect(byte kind, byte x, byte y, byte w, byte h, unsigned int offs);
+void GetDirtyRectAndFree(int index, byte *kind, byte *x, byte *y, byte *w, byte *h, unsigned int *offs);
+void GetDirtyRectAndSetSprite(int index, byte *kind, byte *x, byte *y, byte *w, byte *h, unsigned int *offs);
 
-void PopDirtyRects(unsigned char kind);
-void DrawPersonBubble(unsigned char x, unsigned char y, unsigned char flags, unsigned char *msg);
-void DesciTextBox(unsigned int x, unsigned int y, unsigned int width, unsigned char *msg);
+void PopDirtyRects(byte kind);
+void DrawPersonBubble(byte x, byte y, byte flags, byte *msg);
+void DesciTextBox(unsigned int x, unsigned int y, unsigned int width, byte *msg);
 
 void PromptWait(void);
 
-unsigned char *SeekToString(unsigned char *bank, unsigned int num);
-unsigned char *SeekToStringScr(unsigned char *bank, unsigned int num, unsigned char **ptr);
+byte *SeekToString(byte *bank, unsigned int num);
+byte *SeekToStringScr(byte *bank, unsigned int num, byte **ptr);
 
 #endif

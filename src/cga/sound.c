@@ -77,7 +77,7 @@ static void SpeakerPlay(pcsample_t *sample) {
 
 #define kMaxSounds 12
 
-unsigned char sounds_table[kMaxSounds][3] = {
+byte sounds_table[kMaxSounds][3] = {
 	{20, 0, 0},
 	{19, 0, 0},
 	{176, 0, 0},
@@ -92,7 +92,7 @@ unsigned char sounds_table[kMaxSounds][3] = {
 	{31, 0, 0}
 };
 
-void PlaySound(unsigned char index) {
+void PlaySound(byte index) {
 	int i;
 	for (i = 0; i < kMaxSounds; i++) {
 		if (sounds_table[i][0] == index

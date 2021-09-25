@@ -28,12 +28,12 @@ char DEBUG_SCRIPT_LOG[] = "!script.log";
 
 jmp_buf script_jmp;
 
-unsigned char rand_seed;
-unsigned short the_command;
+byte rand_seed;
+uint16 the_command;
 unsigned int script_res;
-unsigned char *script_ptr, *script_end_ptr;
-unsigned char *script_stack[5 * 2];
-unsigned char **script_stack_ptr = script_stack;
+byte *script_ptr, *script_end_ptr;
+byte *script_stack[5 * 2];
+byte **script_stack_ptr = script_stack;
 
 void *script_vars[ScrPools_MAX] = {
 	&script_word_vars,
@@ -52,7 +52,7 @@ extern void AskDisk2(void);
 /*
 Get next random byte value
 */
-unsigned char Rand(void) {
+byte Rand(void) {
 	script_byte_vars.rand_value = aleat_data[++rand_seed];
 	return script_byte_vars.rand_value;
 }
@@ -60,12 +60,12 @@ unsigned char Rand(void) {
 /*
 Get next random word value
 */
-unsigned short RandW(void) {
-	unsigned short r = Rand() << 8;
+uint16 RandW(void) {
+	uint16 r = Rand() << 8;
 	return r | Rand();
 }
 
-unsigned short Swap16(unsigned short x) {
+uint16 Swap16(uint16 x) {
 	return (x << 8) | (x >> 8);
 }
 
@@ -107,7 +107,7 @@ void ReclaimRefusedItems(void) {
 Trade with a fellow Aspirant (the one that offers to swap an item)
 */
 unsigned int SCR_1_AspirantItemTrade(void) {
-	unsigned char *old_script, *old_script_end = script_end_ptr;
+	byte *old_script, *old_script_end = script_end_ptr;
 
 	item_t *item1, *item2;
 
@@ -189,7 +189,7 @@ unsigned int SCR_1_AspirantItemTrade(void) {
 Trade with a rude/passive Aspirant (the one that says nasty words about you)
 */
 unsigned int SCR_2_RudeAspirantTrade(void) {
-	unsigned char *old_script, *old_script_end = script_end_ptr;
+	byte *old_script, *old_script_end = script_end_ptr;
 
 	item_t *item1, *item2;
 
@@ -287,7 +287,7 @@ unsigned int SCR_2_RudeAspirantTrade(void) {
 Steal a Zapstik form Protozorq
 */
 unsigned int SCR_4_StealZapstik(void) {
-	unsigned char *old_script;
+	byte *old_script;
 
 	pers_t *pers = (pers_t *)(script_vars[ScrPool8_CurrentPers]);
 
@@ -320,12 +320,12 @@ unsigned int SCR_4_StealZapstik(void) {
 }
 
 
-unsigned char wait_delta = 0;
+byte wait_delta = 0;
 
 /*
 Wait for a specified number of seconds (real time) or a keypress
 */
-void Wait(unsigned char seconds) {
+void Wait(byte seconds) {
 #ifdef __WATCOMC__
 	time_t t;
 	time_t endtime;
@@ -379,7 +379,7 @@ Wait for a specified number of seconds or a keypress
 TODO: Always waits for a 4 seconds due to a bug?
 */
 unsigned int SCR_2D_Wait(void) {
-	unsigned char seconds;
+	byte seconds;
 	script_ptr++;
 	seconds = *script_ptr++;
 	Wait(4);    /*TODO: looks like a bug?*/
@@ -404,24 +404,24 @@ unsigned int SCR_2E_PromptWait(void) {
 #define VARSIZE_BYTE 0
 #define VARSIZE_WORD 1
 
-unsigned char var_size;
+byte var_size;
 
 /*
 Fetch variable's value and address
 */
-unsigned short LoadVar(unsigned char **ptr, unsigned char **varptr) {
-	unsigned char vartype;
-	unsigned char *varbase;
-	unsigned short value = 0;
+uint16 LoadVar(byte **ptr, byte **varptr) {
+	byte vartype;
+	byte *varbase;
+	uint16 value = 0;
 	var_size = VARSIZE_BYTE;
 	vartype = *((*ptr)++);
 	if (vartype & VARTYPE_VAR) {
 		/*variable*/
-		unsigned char varoffs;
-		varbase = (unsigned char *)script_vars[vartype & VARTYPE_KIND];
+		byte varoffs;
+		varbase = (byte *)script_vars[vartype & VARTYPE_KIND];
 		if (vartype & VARTYPE_BLOCK) {
-			unsigned char *end;
-			unsigned char index = *((*ptr)++);
+			byte *end;
+			byte index = *((*ptr)++);
 			varbase = SeekToEntryW(varbase, index, &end);
 		}
 		varoffs = *((*ptr)++);
@@ -504,7 +504,7 @@ unsigned short LoadVar(unsigned char **ptr, unsigned char **varptr) {
 /*
 Perform math/logic operation on two operands
 */
-unsigned short MathOp(unsigned char op, unsigned short op1, unsigned short op2) {
+uint16 MathOp(byte op, uint16 op1, uint16 op2) {
 	if (op & MATHOP_CMP) {
 		if (op & MATHOP_EQ)
 			if (op1 == op2) return ~0;
@@ -515,9 +515,9 @@ unsigned short MathOp(unsigned char op, unsigned short op1, unsigned short op2) 
 		if (op & MATHOP_NEQ)
 			if (op1 != op2) return ~0;
 		if (op & MATHOP_LE)
-			if ((signed short)op1 <= (signed short)op2) return ~0;
+			if ((int16)op1 <= (int16)op2) return ~0;
 		if (op & MATHOP_GE)
-			if ((signed short)op1 >= (signed short)op2) return ~0;
+			if ((int16)op1 >= (int16)op2) return ~0;
 		return 0;
 	} else {
 		if (op & MATHOP_ADD)
@@ -537,10 +537,10 @@ unsigned short MathOp(unsigned char op, unsigned short op1, unsigned short op2) 
 /*
 Evaluate an expression
 */
-unsigned short MathExpr(unsigned char **ptr) {
-	unsigned char op;
-	unsigned short op1, op2;
-	unsigned char *opptr;
+uint16 MathExpr(byte **ptr) {
+	byte op;
+	uint16 op1, op2;
+	byte *opptr;
 	op1 = LoadVar(ptr, &opptr);
 	while (((op = *((*ptr)++)) & MATHOP_END) == 0) {
 		op2 = LoadVar(ptr, &opptr);
@@ -553,8 +553,8 @@ unsigned short MathExpr(unsigned char **ptr) {
 Evaluate an expression and assign result to a variable
 */
 unsigned int SCR_3B_MathExpr(void) {
-	unsigned short op1, op2;
-	unsigned char *opptr;
+	uint16 op1, op2;
+	byte *opptr;
 
 	script_ptr++;
 
@@ -611,7 +611,7 @@ Absolute jump
 Jumping past current routine ends the script
 */
 unsigned int SCR_33_Jump(void) {
-	unsigned short offs;
+	uint16 offs;
 	script_ptr++;
 	offs = *script_ptr++;          /*little-endian*/
 	offs |= (*script_ptr++) << 8;
@@ -640,7 +640,7 @@ unsigned int SCR_3C_CondExpr(void) {
 Absolute subroutine call
 */
 unsigned int SCR_34_Call(void) {
-	unsigned short offs;
+	uint16 offs;
 	script_ptr++;
 	offs = *script_ptr++;          /*little-endian*/
 	offs |= (*script_ptr++) << 8;
@@ -663,7 +663,7 @@ unsigned int SCR_35_Ret(void) {
 Draw portrait, pushing it from left to right
 */
 unsigned int SCR_5_DrawPortraitLiftRight(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -679,7 +679,7 @@ unsigned int SCR_5_DrawPortraitLiftRight(void) {
 Draw portrait, pushing it from right to left
 */
 unsigned int SCR_6_DrawPortraitLiftLeft(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -695,7 +695,7 @@ unsigned int SCR_6_DrawPortraitLiftLeft(void) {
 Draw portrait, pushing it from top to bottom
 */
 unsigned int SCR_7_DrawPortraitLiftDown(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -711,7 +711,7 @@ unsigned int SCR_7_DrawPortraitLiftDown(void) {
 Draw portrait, pushing it from bottom to top
 */
 unsigned int SCR_8_DrawPortraitLiftUp(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -727,7 +727,7 @@ unsigned int SCR_8_DrawPortraitLiftUp(void) {
 Draw portrait, no special effects
 */
 unsigned int SCR_9_DrawPortrait(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -748,7 +748,7 @@ unsigned int SCR_A_DrawPortrait(void) {
 /*
 Draw screen pixels using 2-phase clockwise twist
 */
-void TwistDraw(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char *source, unsigned char *target) {
+void TwistDraw(byte x, byte y, byte width, byte height, byte *source, byte *target) {
 	int i;
 	unsigned int sx, ex, sy, ey, t;
 	sx = x * 4;
@@ -783,7 +783,7 @@ void TwistDraw(unsigned char x, unsigned char y, unsigned char width, unsigned c
 Draw image with twist-effect
 */
 unsigned int SCR_B_DrawPortraitTwistEffect(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -803,7 +803,7 @@ unsigned int SCR_B_DrawPortraitTwistEffect(void) {
 /*
 Draw screen pixels using arc-like sweep
 */
-void ArcDraw(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char *source, unsigned char *target) {
+void ArcDraw(byte x, byte y, byte width, byte height, byte *source, byte *target) {
 	int i;
 	unsigned int sx, ex, sy, ey;
 	sx = x * 4;
@@ -834,7 +834,7 @@ void ArcDraw(unsigned char x, unsigned char y, unsigned char width, unsigned cha
 Draw image with arc-effect
 */
 unsigned int SCR_C_DrawPortraitArcEffect(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -856,9 +856,9 @@ Draw image with slow top-to-down reveal effect by repeatedly draw its every 17th
 */
 unsigned int SCR_D_DrawPortraitDotEffect(void) {
 	int i;
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 	unsigned int offs, step = 17;
-	unsigned char *target = CGA_SCREENBUFFER;
+	byte *target = CGA_SCREENBUFFER;
 
 	script_ptr++;
 
@@ -881,7 +881,7 @@ unsigned int SCR_D_DrawPortraitDotEffect(void) {
 Draw image with slow zoom-in reveal effect
 */
 unsigned int SCR_E_DrawPortraitZoomIn(void) {
-	unsigned char x, y, width, height;
+	byte x, y, width, height;
 
 	script_ptr++;
 
@@ -897,8 +897,8 @@ unsigned int SCR_E_DrawPortraitZoomIn(void) {
 Draw image with specified w/h zoom
 */
 unsigned int SCR_10_DrawPortraitZoomed(void) {
-	unsigned char x, y, width, height;
-	unsigned char zwidth, zheight;
+	byte x, y, width, height;
+	byte zwidth, zheight;
 
 	script_ptr++;
 
@@ -927,10 +927,10 @@ unsigned int SCR_10_DrawPortraitZoomed(void) {
 Hide portrait, pushing it from right to left
 */
 unsigned int SCR_19_HidePortraitLiftLeft(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -970,10 +970,10 @@ unsigned int SCR_19_HidePortraitLiftLeft(void) {
 Hide portrait, pushing it from left to right
 */
 unsigned int SCR_1A_HidePortraitLiftRight(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1012,10 +1012,10 @@ unsigned int SCR_1A_HidePortraitLiftRight(void) {
 Hide portrait, pushing it from bottom to top
 */
 unsigned int SCR_1B_HidePortraitLiftUp(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1047,10 +1047,10 @@ unsigned int SCR_1B_HidePortraitLiftUp(void) {
 Hide portrait, pushing it from top to bottom
 */
 unsigned int SCR_1C_HidePortraitLiftDown(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1082,10 +1082,10 @@ unsigned int SCR_1C_HidePortraitLiftDown(void) {
 Hide portrait with twist effect
 */
 unsigned int SCR_1E_HidePortraitTwist(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1106,10 +1106,10 @@ unsigned int SCR_1E_HidePortraitTwist(void) {
 Hide portrait with arc effect
 */
 unsigned int SCR_1F_HidePortraitArc(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1130,10 +1130,10 @@ unsigned int SCR_1F_HidePortraitArc(void) {
 Hide portrait with dots effect
 */
 unsigned int SCR_20_HidePortraitDots(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1156,7 +1156,7 @@ unsigned int SCR_20_HidePortraitDots(void) {
 Play room's door open animation
 */
 unsigned int SCR_39_AnimRoomDoorOpen(void) {
-	unsigned char door;
+	byte door;
 
 	script_ptr++;
 	door = *script_ptr++;
@@ -1168,7 +1168,7 @@ unsigned int SCR_39_AnimRoomDoorOpen(void) {
 Play room's door close animation
 */
 unsigned int SCR_3A_AnimRoomDoorClose(void) {
-	unsigned char door;
+	byte door;
 
 	script_ptr++;
 	door = *script_ptr++;
@@ -1177,8 +1177,8 @@ unsigned int SCR_3A_AnimRoomDoorClose(void) {
 }
 
 unsigned int SCR_25_ChangeZoneOnly(void) {
-	unsigned char index;
-	unsigned char old = script_byte_vars.zone_room;
+	byte index;
+	byte old = script_byte_vars.zone_room;
 
 	script_ptr++;
 	index = *script_ptr++;
@@ -1191,8 +1191,8 @@ unsigned int SCR_25_ChangeZoneOnly(void) {
 #define JCOUNT 16
 
 typedef struct jpoint_t {
-	signed short x;
-	signed short y;
+	int16 x;
+	int16 y;
 } jpoint_t;
 
 static jpoint_t jdeltas[JCOUNT] = {
@@ -1217,7 +1217,7 @@ static jpoint_t jdeltas[JCOUNT] = {
 /*
 Play exploding zoom animation
 */
-void JaggedZoom(unsigned char *source, unsigned char *target) {
+void JaggedZoom(byte *source, byte *target) {
 	int i;
 	jpoint_t points[JCOUNT + 1];
 	unsigned int outside = 0;
@@ -1237,7 +1237,7 @@ void JaggedZoom(unsigned char *source, unsigned char *target) {
 			choices = RandW();
 
 		for (i = 0; i < JCOUNT; i++) {
-			signed short t;
+			int16 t;
 			if (choices & (1 << i)) {
 				t = points[i].x + jdeltas[i].x;
 				if (t < 0 || t >= 600) { /*TODO: 640?*/
@@ -1274,12 +1274,12 @@ void JaggedZoom(unsigned char *source, unsigned char *target) {
 }
 
 typedef struct star_t {
-	unsigned short ofs;
-	unsigned char pixel;
-	unsigned char mask;
-	signed short x;
-	signed short y;
-	unsigned short z;
+	uint16 ofs;
+	byte pixel;
+	byte mask;
+	int16 x;
+	int16 y;
+	uint16 z;
 } star_t;
 
 /*
@@ -1309,12 +1309,12 @@ star_t *InitStarfield(void) {
 /*
 Draw a frame of starfield animation and update stars
 */
-void DrawStars(star_t *stars, int iter, unsigned char *target) {
+void DrawStars(star_t *stars, int iter, byte *target) {
 	int i;
 	/*TODO: bug? initialized 300 stars, but animated only 256?*/
 	for (i = 0; i < 256; i++, stars++) {
 		short z, x, y;
-		unsigned char pixel, mask;
+		byte pixel, mask;
 
 		target[stars->ofs] &= stars->mask;
 		if (stars->z < 328) {
@@ -1354,7 +1354,7 @@ void DrawStars(star_t *stars, int iter, unsigned char *target) {
 /*
 Play starfield animation
 */
-void AnimStarfield(star_t *stars, unsigned char *target) {
+void AnimStarfield(star_t *stars, byte *target) {
 	int i;
 	for (i = 100; i; i--)
 		DrawStars(stars, i, target);
@@ -1398,7 +1398,7 @@ unsigned int SCR_4C_DrawPersons(void) {
 Redraw all room's static objects
 */
 unsigned int SCR_13_RedrawRoomStatics(void) {
-	unsigned char index;
+	byte index;
 	script_ptr++;
 	index = *script_ptr++;
 	RedrawRoomStatics(index, 0);
@@ -1410,7 +1410,7 @@ Go to a new zone
 If go through a door, play door's opening animation
 */
 unsigned int SCR_42_LoadZone(void) {
-	unsigned char index;
+	byte index;
 
 	script_ptr++;
 	index = *script_ptr++;
@@ -1472,7 +1472,7 @@ unsigned int SCR_5A_SelectPalette(void) {
 Apply specific palette
 */
 unsigned int SCR_5E_SelectTempPalette(void) {
-	unsigned char index;
+	byte index;
 	script_ptr++;
 	index = *script_ptr++;
 	SelectSpecificPalette(index);
@@ -1500,8 +1500,8 @@ unsigned int SCR_36_ChangeZone(void) {
 /*
 Draw a static sprite in the room
 */
-void SCR_DrawRoomObjectBack(unsigned char *x, unsigned char *y, unsigned char *w, unsigned char *h) {
-	unsigned char obj[3];
+void SCR_DrawRoomObjectBack(byte *x, byte *y, byte *w, byte *h) {
+	byte obj[3];
 
 	script_ptr++;
 	obj[0] = *script_ptr++; /*spr*/
@@ -1515,7 +1515,7 @@ void SCR_DrawRoomObjectBack(unsigned char *x, unsigned char *y, unsigned char *w
 Draw a static sprite in the room (to backbuffer)
 */
 unsigned int SCR_5F_DrawRoomObjectBack(void) {
-	unsigned char x, y, w, h;
+	byte x, y, w, h;
 	SCR_DrawRoomObjectBack(&x, &y, &w, &h);
 	return 0;
 }
@@ -1524,7 +1524,7 @@ unsigned int SCR_5F_DrawRoomObjectBack(void) {
 Display a static sprite in the room (to screen)
 */
 unsigned int SCR_11_DrawRoomObject(void) {
-	unsigned char x, y, w, h;
+	byte x, y, w, h;
 	SCR_DrawRoomObjectBack(&x, &y, &w, &h);
 	CGA_CopyScreenBlock(backbuffer, w, h, frontbuffer, CGA_CalcXY_p(x, y));
 	return 0;
@@ -1534,11 +1534,11 @@ unsigned int SCR_11_DrawRoomObject(void) {
 Draw box with item sprite and its name
 */
 unsigned int SCR_3_DrawItemBox(void) {
-	unsigned char current;
+	byte current;
 
 	item_t *item;
-	unsigned char x, y;
-	unsigned char *msg;
+	byte x, y;
+	byte *msg;
 
 	script_ptr++;
 	current = *script_ptr++;
@@ -1562,8 +1562,8 @@ unsigned int SCR_3_DrawItemBox(void) {
 Draw simple bubble with text
 */
 unsigned int SCR_37_DesciTextBox(void) {
-	unsigned char x, y, w;
-	unsigned char *msg;
+	byte x, y, w;
+	byte *msg;
 	script_ptr++;
 	msg = SeekToStringScr(desci_data, *script_ptr, &script_ptr);
 	script_ptr++;
@@ -1579,7 +1579,7 @@ unsigned int SCR_37_DesciTextBox(void) {
 Play portrait animation
 */
 unsigned int SCR_18_AnimPortrait(void) {
-	unsigned char layer, index, delay;
+	byte layer, index, delay;
 	script_ptr++;
 
 	layer = *script_ptr++;
@@ -1595,7 +1595,7 @@ unsigned int SCR_18_AnimPortrait(void) {
 Play animation
 */
 unsigned int SCR_38_PlayAnim(void) {
-	unsigned char index, x, y;
+	byte index, x, y;
 	script_ptr++;
 	index = *script_ptr++;
 	x = *script_ptr++;
@@ -1608,10 +1608,10 @@ unsigned int SCR_38_PlayAnim(void) {
 Pop up the actions menu and handle its commands
 */
 unsigned int SCR_3D_ActionsMenu(void) {
-	unsigned short cmd;
+	uint16 cmd;
 
-	unsigned char *old_script = script_ptr;
-	unsigned char *old_script_end = script_end_ptr;
+	byte *old_script = script_ptr;
+	byte *old_script_end = script_end_ptr;
 
 	act_menu_x = 0xFF;
 
@@ -1673,8 +1673,8 @@ unsigned int SCR_3E_TheWallAdvance(void) {
 When playing cups with proto
 */
 unsigned int SCR_28_MenuLoop(void) {
-	unsigned char cursor;
-	unsigned char mask, value;
+	byte cursor;
+	byte mask, value;
 
 	script_ptr++;
 	cursor = *script_ptr++;
@@ -1693,10 +1693,10 @@ unsigned int SCR_28_MenuLoop(void) {
 Restore screen data from back buffer as specified by dirty rects of specified index
 */
 unsigned int SCR_2A_PopDialogRect(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1724,10 +1724,10 @@ unsigned int SCR_2B_PopAllBubbles(void) {
 Hide a portrait, with shatter effect
 */
 unsigned int SCR_22_HidePortraitShatter(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1748,10 +1748,10 @@ unsigned int SCR_22_HidePortraitShatter(void) {
 Hide a portrait, no special effects
 */
 unsigned int SCR_23_HidePortrait(void) {
-	unsigned char index;
-	unsigned char kind;
-	unsigned char x, y;
-	unsigned char width, height;
+	byte index;
+	byte kind;
+	byte x, y;
+	byte width, height;
 	unsigned int offs;
 
 	script_ptr++;
@@ -1818,18 +1818,18 @@ unsigned int SCR_41_LiftHand(void) {
 	return 0;
 }
 
-unsigned char fight_mode = 0;
+byte fight_mode = 0;
 
 unsigned int SCR_30_Fight(void) {
-	static unsigned char player_image[] = {26, 0, 0};
-	unsigned char *image = player_image;
+	static byte player_image[] = {26, 0, 0};
+	byte *image = player_image;
 
-	unsigned char x, y, width, height, kind;
+	byte x, y, width, height, kind;
 	unsigned int offs;
-	unsigned char *old_script, *old_script_end = script_end_ptr;
+	byte *old_script, *old_script_end = script_end_ptr;
 	pers_t *pers = (pers_t *)(script_vars[ScrPool8_CurrentPers]);
 
-	unsigned char strenght, win, rnd;
+	byte strenght, win, rnd;
 
 	script_ptr++;
 	old_script = script_ptr;
@@ -1878,7 +1878,7 @@ unsigned int SCR_30_Fight(void) {
 	script_byte_vars.fight_status = 0;
 
 	if (script_byte_vars.extreme_violence == 0) {
-		static unsigned char character_strenght[] = {
+		static byte character_strenght[] = {
 			1,	/*THE MASTER OF ORDEALS*/
 			3,	/*PROTOZORQ*/
 			1,	/*VORT*/
@@ -1957,11 +1957,11 @@ unsigned int SCR_30_Fight(void) {
 	return 0;
 }
 
-unsigned char prev_fight_mode = 0;
-unsigned short fight_pers_ofs = 0;
+byte prev_fight_mode = 0;
+uint16 fight_pers_ofs = 0;
 
 typedef struct fightentry_t {
-	unsigned char   room;
+	byte   room;
 	animdesc_t      anim;
 } fightentry_t;
 
@@ -2039,7 +2039,7 @@ unsigned int SCR_31_Fight2(void) {
 
 	if (script_byte_vars.bvar_43 != 18) {
 		pers_t *pers = (pers_t *)(script_vars[ScrPool8_CurrentPers]);
-		fight_pers_ofs = (unsigned char *)pers - (unsigned char *)pers_list; /*TODO check size*/
+		fight_pers_ofs = (byte *)pers - (byte *)pers_list; /*TODO check size*/
 		pers->flags |= PERSFLG_40;
 		pers->area = 0;
 		found_spot->flags &= ~SPOTFLG_80;
@@ -2070,7 +2070,7 @@ unsigned int SCR_31_Fight2(void) {
 				unsigned int i;
 				fightentry_t *fightlist;
 				unsigned int fightlistsize;
-				unsigned char animidx;
+				byte animidx;
 
 				prev_fight_mode = 0;
 				switch (pers->name) {
@@ -2192,7 +2192,7 @@ unsigned int SCR_60_ReviveCadaver(void) {
 
 
 unsigned int SCR_57_ShowCharacterSprite(void) {
-	unsigned char index, x, y;
+	byte index, x, y;
 
 	script_ptr++;
 	index = *script_ptr++;
@@ -2205,7 +2205,7 @@ unsigned int SCR_57_ShowCharacterSprite(void) {
 }
 
 unsigned int SCR_58_DrawCharacterSprite(void) {
-	unsigned char index, x, y;
+	byte index, x, y;
 
 	script_ptr++;
 	index = *script_ptr++;
@@ -2220,7 +2220,7 @@ unsigned int SCR_58_DrawCharacterSprite(void) {
 extern void ExitGame(void);
 
 unsigned int SCR_15_SelectSpot(void) {
-	unsigned char mask, index;
+	byte mask, index;
 
 	script_ptr++;
 	mask = *script_ptr++;
@@ -2290,7 +2290,7 @@ unsigned int SCR_45_DeProfundisRoomEntry(void) {
 Animate De Profundis hook (lower)
 */
 unsigned int SCR_46_DeProfundisLowerHook(void) {
-	unsigned char y;
+	byte y;
 	unsigned int w, h;
 	unsigned int sprofs, ofs;
 
@@ -2320,7 +2320,7 @@ unsigned int SCR_46_DeProfundisLowerHook(void) {
 Animate De Profundis monster (rise)
 */
 unsigned int SCR_47_DeProfundisRiseMonster(void) {
-	unsigned char y;
+	byte y;
 	unsigned int w, h;
 	unsigned int sprofs, ofs;
 
@@ -2351,7 +2351,7 @@ unsigned int SCR_47_DeProfundisRiseMonster(void) {
 Animate De Profundis monster (lower)
 */
 unsigned int SCR_48_DeProfundisLowerMonster(void) {
-	unsigned char y;
+	byte y;
 	unsigned int w, h;
 	unsigned int sprofs, ofs;
 
@@ -2381,7 +2381,7 @@ unsigned int SCR_48_DeProfundisLowerMonster(void) {
 Animate De Profundis hook (rise)
 */
 unsigned int SCR_49_DeProfundisRiseHook(void) {
-	unsigned char y;
+	byte y;
 	unsigned int w, h;
 	unsigned int sprofs, ofs;
 
@@ -2412,8 +2412,8 @@ unsigned int SCR_49_DeProfundisRiseHook(void) {
 Animate De Profundis platform
 */
 unsigned int SCR_65_DeProfundisMovePlatform(void) {
-	unsigned char state;
-	unsigned char x, y;
+	byte state;
+	byte x, y;
 	unsigned int w, h;
 	unsigned int sprofs, ofs;
 
@@ -2496,7 +2496,7 @@ unsigned int SCR_4F_BounceCurrentItemToInventory(void) {
 Draw item bounce to inventory animation
 */
 unsigned int SCR_50_BounceItemToInventory(void) {
-	unsigned char itemidx;
+	byte itemidx;
 
 	script_ptr++;
 	itemidx = *script_ptr++;
@@ -2556,8 +2556,8 @@ unsigned int SCR_2F_LootAspirantsItem() {
 Trade with Skull Trader
 */
 unsigned int SCR_51_SkullTraderItemTrade(void) {
-	unsigned char *old_script, *old_script_end = script_end_ptr;
-	unsigned char status;
+	byte *old_script, *old_script_end = script_end_ptr;
+	byte status;
 
 	if (script_byte_vars.bvar_26 >= 63)  /*TODO: hang?*/
 		return 0;
@@ -2614,7 +2614,7 @@ unsigned int SCR_52_RefreshSpritesData(void) {
 }
 
 unsigned int SCR_53_FindInvItem(void) {
-	unsigned char first, count, flags, i;
+	byte first, count, flags, i;
 	item_t *item;
 	script_ptr++;
 	first = *script_ptr++;
@@ -2705,7 +2705,7 @@ void ShowMirrored(unsigned int h, unsigned int ofs) {
 	}
 }
 
-void LiftLines(int n, unsigned char *source, unsigned int sofs, unsigned char *target, unsigned int tofs) {
+void LiftLines(int n, byte *source, unsigned int sofs, byte *target, unsigned int tofs) {
 	while (n--) {
 		memcpy(target + tofs, source + sofs, CGA_BYTES_PER_LINE);
 
@@ -2724,14 +2724,14 @@ void LiftLines(int n, unsigned char *source, unsigned int sofs, unsigned char *t
 #define kSaucerAnimFrames 53
 
 static void AnimSaucer(void) {
-	static unsigned char image1[] = {167, 0, 146};
-	unsigned char *pimage1 = image1;
-	unsigned char *sequence = souco_data;
-	unsigned char x, y, width, height;
-	unsigned short xx, yy, ww, hh;
-	unsigned char height_new, height_prev;
+	static byte image1[] = {167, 0, 146};
+	byte *pimage1 = image1;
+	byte *sequence = souco_data;
+	byte x, y, width, height;
+	uint16 xx, yy, ww, hh;
+	byte height_new, height_prev;
 	unsigned int delay;
-	unsigned char scroll_done = 0;
+	byte scroll_done = 0;
 
 	memset(backbuffer, 0, sizeof(backbuffer) - 2);  /*TODO: original bug?*/
 	CGA_BackBufferToRealFull();
@@ -2903,8 +2903,8 @@ unsigned int SCR_5D_DropWeapons(void) {
 React to Psi power
 */
 unsigned int SCR_62_PsiReaction(void) {
-	unsigned char power;
-	unsigned short cmd;
+	byte power;
+	uint16 cmd;
 
 	script_ptr++;
 	power = *script_ptr++;
@@ -2942,7 +2942,7 @@ unsigned int SCR_64_DrawBoxAroundSpot(void) {
 Draw text box
 */
 unsigned int SCR_14_DrawDesc(void) {
-	unsigned char *msg;
+	byte *msg;
 	script_ptr++;
 	msg = SeekToStringScr(desci_data, *script_ptr, &script_ptr);
 	script_ptr++;
@@ -2958,8 +2958,8 @@ Draw dialog bubble with text for a person, wait for a key, then hide. Auto find 
 Use "thought" spike
 */
 unsigned int SCR_17_DrawPersonThoughtBubbleDialog(void) {
-	unsigned char x, y;
-	unsigned char *msg;
+	byte x, y;
+	byte *msg;
 	script_ptr++;
 	msg = SeekToStringScr(diali_data, *script_ptr, &script_ptr);
 	script_ptr++;
@@ -2982,8 +2982,8 @@ Draw dialog bubble with text for a person, wait for a key, then hide. Auto find 
 Use normal spike
 */
 unsigned int SCR_61_DrawPersonBubbleDialog(void) {
-	unsigned char x, y;
-	unsigned char *msg;
+	byte x, y;
+	byte *msg;
 	script_ptr++;
 	msg = SeekToStringScr(diali_data, *script_ptr, &script_ptr);
 	script_ptr++;
@@ -3003,10 +3003,10 @@ unsigned int SCR_61_DrawPersonBubbleDialog(void) {
 
 #if 0
 #include <stdio.h>
-unsigned char *DebugString(char *msg, ...) {
+byte *DebugString(char *msg, ...) {
 	int i;
-	unsigned char c;
-	static unsigned char m[256];
+	byte c;
+	static byte m[256];
 	va_list ap;
 
 	va_start(ap, msg);
@@ -3046,7 +3046,7 @@ unsigned char *DebugString(char *msg, ...) {
 Draw dialog bubble with text for gauss
 */
 unsigned int SCR_27_DrawGaussBubble(void) {
-	unsigned char *msg;
+	byte *msg;
 
 	script_ptr++;
 	msg = SeekToStringScr(diali_data, *script_ptr, &script_ptr);
@@ -3060,8 +3060,8 @@ unsigned int SCR_27_DrawGaussBubble(void) {
 Draw dialog bubble with text
 */
 unsigned int SCR_29_DialiTextBox(void) {
-	unsigned char x, y, f;
-	unsigned char *msg;
+	byte x, y, f;
+	byte *msg;
 	script_ptr++;
 	msg = SeekToStringScr(diali_data, *script_ptr, &script_ptr);
 	cur_dlg_index = cur_str_index;  /*TODO: useless?*/
@@ -3116,7 +3116,7 @@ unsigned int SCR_68_Unused(void) {
 Play sound
 */
 unsigned int SCR_69_PlaySound(void) {
-	unsigned char index;
+	byte index;
 	script_ptr++;
 	index = *script_ptr++;
 	script_ptr++;
@@ -3179,10 +3179,10 @@ unsigned int CMD_3_Posessions(void) {
 Show energy level
 */
 unsigned int CMD_4_EnergyLevel(void) {
-	static unsigned char energy_image[] = {130, 236 / 4, 71};
-	unsigned char x, y, width, height;
-	unsigned char *image = energy_image;
-	unsigned char anim = 40;
+	static byte energy_image[] = {130, 236 / 4, 71};
+	byte x, y, width, height;
+	byte *image = energy_image;
+	byte anim = 40;
 
 	PopDirtyRects(DirtyRectSprite);
 	PopDirtyRects(DirtyRectBubble);
@@ -3257,17 +3257,17 @@ unsigned int CMD_7_Save(void) {
 Show timer
 */
 unsigned int CMD_8_Timer(void) {
-	static unsigned char timer_image[] = {163, 244 / 4, 104};
-	unsigned char x, y, width, height;
-	unsigned char *image = timer_image;
+	static byte timer_image[] = {163, 244 / 4, 104};
+	byte x, y, width, height;
+	byte *image = timer_image;
 
 	if (DrawPortrait(&image, &x, &y, &width, &height)) {
 		CGA_BlitAndWait(cur_image_pixels, cur_image_size_w, cur_image_size_w, cur_image_size_h, CGA_SCREENBUFFER, cur_image_offs);
 	}
 
 	do {
-		unsigned short timer = Swap16(script_word_vars.timer_ticks2);
-		unsigned short minutes = timer % (60 * 60);
+		uint16 timer = Swap16(script_word_vars.timer_ticks2);
+		uint16 minutes = timer % (60 * 60);
 
 		char_draw_coords_x = 260 / 4;
 		char_draw_coords_y = 120;
@@ -3285,8 +3285,8 @@ unsigned int CMD_8_Timer(void) {
 	return 0;
 }
 
-int ConsumePsiEnergy(unsigned char amount) {
-	unsigned char current = script_byte_vars.psy_energy;
+int ConsumePsiEnergy(byte amount) {
+	byte current = script_byte_vars.psy_energy;
 
 	if (current < amount) {
 		/*no energy left*/
@@ -3321,17 +3321,17 @@ unsigned int CMD_A_PsiSolarEyes(void) {
 }
 
 
-unsigned short GetZoneObjCommand(unsigned int offs) {
+uint16 GetZoneObjCommand(unsigned int offs) {
 	/*TODO: fix me: change offs/2 to index*/
 	the_command = Swap16(script_word_vars.zone_obj_cmds[(script_byte_vars.cur_spot_idx - 1) * 5 + offs / 2]);
 	return the_command;
 }
 
 void DrawStickyNet(void) {
-	unsigned char x, y, w, h;
+	byte x, y, w, h;
 
 	unsigned int ofs;
-	unsigned char *sprite = LoadPuzzlToScratch(80);
+	byte *sprite = LoadPuzzlToScratch(80);
 
 	x = room_bounds_rect.sx;
 	y = room_bounds_rect.sy;
@@ -3438,7 +3438,7 @@ unsigned int CMD_D_PsiBrainwarp(void) {
 
 
 unsigned int CMD_E_PsiZoneScan(void) {
-	unsigned char x, y, w, h;
+	byte x, y, w, h;
 	unsigned int offs;
 
 	if (!ConsumePsiEnergy(1))
@@ -3506,7 +3506,7 @@ unsigned int CMD_F_PsiPsiShift(void) {
 }
 
 unsigned int CMD_10_PsiExtremeViolence(void) {
-	unsigned short command;
+	uint16 command;
 
 	if (!ConsumePsiEnergy(8))
 		return 0;
@@ -3539,8 +3539,8 @@ unsigned int CMD_10_PsiExtremeViolence(void) {
 }
 
 unsigned int CMD_11_PsiTuneIn(void) {
-	unsigned short command;
-	unsigned char *msg;
+	uint16 command;
+	byte *msg;
 
 	if (!ConsumePsiEnergy(4))
 		return 0;
@@ -3571,12 +3571,12 @@ unsigned int CMD_11_PsiTuneIn(void) {
 	return 0;
 }
 
-void ActionForPersonChoice(unsigned short *actions) {
+void ActionForPersonChoice(uint16 *actions) {
 	ProcessMenu();
 	the_command = 0x9183;   /*THERE`S NOBODY.*/
 	if (script_byte_vars.cur_spot_idx != 0 && script_byte_vars.cur_pers != 0) {
 		pers_t *pers = (pers_t *)script_vars[ScrPool8_CurrentPers];
-		unsigned char index = pers->name;
+		byte index = pers->name;
 		if (index == 93)    /*CADAVER*/
 			index = 19 + 42;
 		else if (index == 133)  /*SCI FI*/
@@ -3591,7 +3591,7 @@ void ActionForPersonChoice(unsigned short *actions) {
 }
 
 /*TODO: ensure these are never accessed/modified from the scripts*/
-unsigned short menu_commands_12[] = {
+uint16 menu_commands_12[] = {
 	0xC0F0,
 	0xC0D7,
 	0x9019,
@@ -3614,7 +3614,7 @@ unsigned short menu_commands_12[] = {
 	0x9007
 };
 
-unsigned short menu_commands_22[] = {
+uint16 menu_commands_22[] = {
 	0xC325,
 	0xC326,
 	0xC31B,
@@ -3637,7 +3637,7 @@ unsigned short menu_commands_22[] = {
 	0xC324
 };
 
-unsigned short menu_commands_24[] = {
+uint16 menu_commands_24[] = {
 	0xC344,
 	0xC34A,
 	0xC343,
@@ -3660,7 +3660,7 @@ unsigned short menu_commands_24[] = {
 	0xC343
 };
 
-unsigned short menu_commands_23[] = {
+uint16 menu_commands_23[] = {
 	0xC002,
 	0xC32A,
 	0x9019,
@@ -3690,12 +3690,12 @@ unsigned int CMD_12_(void) {
 }
 
 unsigned int CMD_13_ActivateFountain(void) {
-	static unsigned char water1[] = {125, 156 / 4, 58};
-	static unsigned char water2[] = {126, 156 / 4, 58};
-	static unsigned char headl[] = {88, 152 / 4, 52};
-	static unsigned char headr[] = {88, (160 / 4) | 0x80, 52};
+	static byte water1[] = {125, 156 / 4, 58};
+	static byte water2[] = {126, 156 / 4, 58};
+	static byte headl[] = {88, 152 / 4, 52};
+	static byte headr[] = {88, (160 / 4) | 0x80, 52};
 
-	unsigned char x, y, w, h;
+	byte x, y, w, h;
 	unsigned int i, j;
 
 	script_byte_vars.bvar_6A = 1;
@@ -3737,8 +3737,8 @@ pers_t *vort_ptr;
 #define ADJACENT_AREAS_MAX 19
 
 struct {
-	unsigned char zone; /* current zone */
-	unsigned char area; /* area accessible from this zone */
+	byte zone; /* current zone */
+	byte area; /* area accessible from this zone */
 } adjacent_areas[ADJACENT_AREAS_MAX] = {
 	{  2,  5},
 	{  3,  8},
@@ -3851,9 +3851,9 @@ unsigned int CMD_18_AspirantLeave(void) {
 Show Holo screen anim and speech
 */
 unsigned int CMD_1B_Holo(void) {
-	unsigned char x, y;
+	byte x, y;
 	unsigned int num;
-	unsigned char *msg;
+	byte *msg;
 
 	x = found_spot->sx;
 	y = found_spot->sy;
@@ -3936,9 +3936,9 @@ unsigned int CMD_20_TurkeyGone(void) {
 Talk to Vorts
 */
 unsigned int CMD_21_VortTalk(void) {
-	unsigned char x, y;
+	byte x, y;
 	unsigned int num;
-	unsigned char *msg;
+	byte *msg;
 
 	if (script_byte_vars.rand_value >= 85)
 		num = 6;
@@ -4167,7 +4167,7 @@ int runcmd_reentr = 0;
 /*
 Run script routine
 */
-unsigned int RunScript(unsigned char *code) {
+unsigned int RunScript(byte *code) {
 	unsigned int status = ScriptContinue;
 
 #ifdef DEBUG_SCRIPT
@@ -4176,7 +4176,7 @@ unsigned int RunScript(unsigned char *code) {
 
 	script_ptr = code;
 	while (script_ptr != script_end_ptr) {
-		unsigned char opcode = *script_ptr;
+		byte opcode = *script_ptr;
 
 #ifdef DEBUG_SCRIPT
 		{
@@ -4216,7 +4216,7 @@ unsigned int RunScript(unsigned char *code) {
 /*
 Get script routine
 */
-unsigned char *GetScriptSubroutine(unsigned int index) {
+byte *GetScriptSubroutine(unsigned int index) {
 	return SeekToEntry(templ_data, index, &script_end_ptr);
 }
 
@@ -4225,7 +4225,7 @@ Run script command
 */
 unsigned int RunCommand(void) {
 	unsigned int res;
-	unsigned short cmd;
+	uint16 cmd;
 
 again:;
 	res = 0;

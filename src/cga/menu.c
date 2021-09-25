@@ -7,8 +7,8 @@
 #include "sound.h"
 #include "script.h"
 
-unsigned char act_menu_x = 0;
-unsigned char act_menu_y = 0;
+byte act_menu_x = 0;
+byte act_menu_y = 0;
 
 rect_t *act_dot_rects_cur;
 rect_t *act_dot_rects_end;
@@ -16,7 +16,7 @@ rect_t *act_dot_rects_end;
 /*choice dots placement on actions menu*/
 rect_t act_dot_rects[8 + 1];
 struct {
-	unsigned char x, y;
+	byte x, y;
 } act_dot_coords[8] = {
 	{ 2,  0},
 	{ 8, 32},
@@ -29,7 +29,7 @@ struct {
 };
 
 /*Handle keyboard keys in actions menu (to cycle through choices with directional keys)*/
-unsigned char PollKeyboardInActionsMenu(void) {
+byte PollKeyboardInActionsMenu(void) {
 	if (!key_direction) {
 		key_held = 0;
 		return key_code;
@@ -53,7 +53,7 @@ unsigned char PollKeyboardInActionsMenu(void) {
 
 /*Handle player input in actions menu*/
 void PollInputInActionsMenu(void) {
-	unsigned char keys;
+	byte keys;
 	if (have_mouse)
 		keys = PollMouse();
 	else
@@ -62,11 +62,11 @@ void PollInputInActionsMenu(void) {
 }
 
 /*Draw actions menu and process its choices*/
-void ActionsMenu(unsigned char **pinfo) {
-	unsigned char x, y;
-	unsigned char choices;
+void ActionsMenu(byte **pinfo) {
+	byte x, y;
+	byte choices;
 	int i, choice, numchoices;
-	unsigned char *menurecs;
+	byte *menurecs;
 
 	last_object_hint = object_hint;
 
@@ -159,7 +159,7 @@ void ActionsMenu(unsigned char **pinfo) {
 }
 
 /*TODO: maybe rename to SpotsLoop*/
-void MenuLoop(unsigned char spotmask, unsigned char spotvalue) {
+void MenuLoop(byte spotmask, byte spotvalue) {
 	ProcessInput();
 	do {
 		PollInput();

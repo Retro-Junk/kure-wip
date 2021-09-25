@@ -1,3 +1,4 @@
+#include "common.h"
 #include "resdata.h"
 
-unsigned char puzzl_data[RES_PUZZL_MAX];
+byte puzzl_data[RES_PUZZL_MAX];

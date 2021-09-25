@@ -19,140 +19,140 @@ enum ScriptPools {
 
 /*Byte-packed, members accessed from script code by hardcoded offsets*/
 typedef struct script_byte_vars_t {
-	unsigned char zone_index;       /*  0 */
-	unsigned char zone_room;        /*  1 */
-	unsigned char last_door;        /*  2 */
-	unsigned char cur_spot_idx;     /*  3 */
-	unsigned char the_wall_phase;   /*  4 */
-	unsigned char prev_zone_index;  /*  5 */
-	unsigned char bvar_06;          /*  6 */
-	unsigned char bvar_07;          /*  7 */
-	unsigned char bvar_08;          /*  8 */
-	unsigned char bvar_09;          /*  9 */
-	unsigned char bvar_0A;          /*  A */
-	unsigned char bvar_0B;          /*  B */
-	unsigned char zone_area;        /*  C */
-	unsigned char dead_flag;        /*  D */
-	volatile unsigned char timer_ticks; /*  E */
-	unsigned char gauss_phase;      /*  F */
+	byte zone_index;       /*  0 */
+	byte zone_room;        /*  1 */
+	byte last_door;        /*  2 */
+	byte cur_spot_idx;     /*  3 */
+	byte the_wall_phase;   /*  4 */
+	byte prev_zone_index;  /*  5 */
+	byte bvar_06;          /*  6 */
+	byte bvar_07;          /*  7 */
+	byte bvar_08;          /*  8 */
+	byte bvar_09;          /*  9 */
+	byte bvar_0A;          /*  A */
+	byte bvar_0B;          /*  B */
+	byte zone_area;        /*  C */
+	byte dead_flag;        /*  D */
+	volatile byte timer_ticks; /*  E */
+	byte gauss_phase;      /*  F */
 
-	unsigned char bvar_10;          /* 10 */
-	unsigned char rand_value;       /* 11 */
-	unsigned char load_flag;        /* 12 */
-	unsigned char spot_m;           /* 13 */
-	unsigned char spot_v;           /* 14 */
-	unsigned char bvar_15;          /* 15 */
-	unsigned char bvar_16;          /* 16 */
-	unsigned char bvar_17;          /* 17 */
-	unsigned char bvar_18;          /* 18 */
-	unsigned char bvar_19;          /* 19 */
-	unsigned char bvar_1A;          /* 1A */
-	unsigned char bvar_1B;          /* 1B */
-	unsigned char bvar_1C;          /* 1C */
-	unsigned char bvar_1D;          /* 1D */
-	unsigned char bvar_1E;          /* 1E */
-	unsigned char bvar_1F;          /* 1F */
+	byte bvar_10;          /* 10 */
+	byte rand_value;       /* 11 */
+	byte load_flag;        /* 12 */
+	byte spot_m;           /* 13 */
+	byte spot_v;           /* 14 */
+	byte bvar_15;          /* 15 */
+	byte bvar_16;          /* 16 */
+	byte bvar_17;          /* 17 */
+	byte bvar_18;          /* 18 */
+	byte bvar_19;          /* 19 */
+	byte bvar_1A;          /* 1A */
+	byte bvar_1B;          /* 1B */
+	byte bvar_1C;          /* 1C */
+	byte bvar_1D;          /* 1D */
+	byte bvar_1E;          /* 1E */
+	byte bvar_1F;          /* 1F */
 
-	unsigned char cur_pers;         /* 20 */
-	unsigned char used_commands;    /* 21 */
-	unsigned char tries_left;       /* 22 */
-	unsigned char inv_item_index;   /* 23 */
-	unsigned char bvar_24;          /* 24 */
-	unsigned char bvar_25;          /* 25 */
-	unsigned char bvar_26;          /* 26 */
-	unsigned char bvar_27;          /* 27 */
-	unsigned char bvar_28;          /* 28 */
-	unsigned char bvar_29;          /* 29 */
-	unsigned char bvar_2A;          /* 2A */
-	unsigned char hands;            /* 2B */
-	unsigned char check_used_commands; /* 2C */
-	unsigned char bvar_2D;          /* 2D */
-	unsigned char palette_index;    /* 2E */
-	unsigned char bvar_2F;          /* 2F */
+	byte cur_pers;         /* 20 */
+	byte used_commands;    /* 21 */
+	byte tries_left;       /* 22 */
+	byte inv_item_index;   /* 23 */
+	byte bvar_24;          /* 24 */
+	byte bvar_25;          /* 25 */
+	byte bvar_26;          /* 26 */
+	byte bvar_27;          /* 27 */
+	byte bvar_28;          /* 28 */
+	byte bvar_29;          /* 29 */
+	byte bvar_2A;          /* 2A */
+	byte hands;            /* 2B */
+	byte check_used_commands; /* 2C */
+	byte bvar_2D;          /* 2D */
+	byte palette_index;    /* 2E */
+	byte bvar_2F;          /* 2F */
 
-	unsigned char bvar_30;          /* 30 */
-	unsigned char zapstiks_owned;   /* 31 */
-	unsigned char bvar_32;          /* 32 */
-	unsigned char bvar_33;          /* 33 */
-	unsigned char bvar_34;          /* 34 */
-	unsigned char skulls_submitted; /* 35 */
-	unsigned char bvar_36;          /* 36 */
-	unsigned char bvar_37;          /* 37 */
-	unsigned char zone_area_copy;   /* 38 */
-	unsigned char aspirant_flags;   /* 39 */
-	unsigned char aspirant_pers_ofs;/* 3A */
-	unsigned char steals_count;     /* 3B */
-	unsigned char fight_status;     /* 3C */
-	unsigned char extreme_violence; /* 3D */
-	unsigned char trade_accepted;   /* 3E */
-	unsigned char bvar_3F;          /* 3F */
+	byte bvar_30;          /* 30 */
+	byte zapstiks_owned;   /* 31 */
+	byte bvar_32;          /* 32 */
+	byte bvar_33;          /* 33 */
+	byte bvar_34;          /* 34 */
+	byte skulls_submitted; /* 35 */
+	byte bvar_36;          /* 36 */
+	byte bvar_37;          /* 37 */
+	byte zone_area_copy;   /* 38 */
+	byte aspirant_flags;   /* 39 */
+	byte aspirant_pers_ofs;/* 3A */
+	byte steals_count;     /* 3B */
+	byte fight_status;     /* 3C */
+	byte extreme_violence; /* 3D */
+	byte trade_accepted;   /* 3E */
+	byte bvar_3F;          /* 3F */
 
-	unsigned char bvar_40;          /* 40 */
-	unsigned char bvar_41;          /* 41 */
-	unsigned char bvar_42;          /* 42 */
-	unsigned char bvar_43;          /* 43 */
-	unsigned char dirty_rect_kind;  /* 44 */
-	unsigned char bvar_45;          /* 45 */
-	unsigned char bvar_46;          /* 46 */
-	unsigned char game_paused;      /* 47 */
-	unsigned char skull_trader_status;/* 48 */
-	unsigned char cur_spot_flags;   /* 49 */
-	unsigned char bvar_4A;          /* 4A */
-	unsigned char bvar_4B;          /* 4B */
-	unsigned char bvar_4C;          /* 4C */
-	unsigned char bvar_4D;          /* 4D */
-	unsigned char bvar_4E;          /* 4E */
-	unsigned char bvar_4F;          /* 4F */
+	byte bvar_40;          /* 40 */
+	byte bvar_41;          /* 41 */
+	byte bvar_42;          /* 42 */
+	byte bvar_43;          /* 43 */
+	byte dirty_rect_kind;  /* 44 */
+	byte bvar_45;          /* 45 */
+	byte bvar_46;          /* 46 */
+	byte game_paused;      /* 47 */
+	byte skull_trader_status;/* 48 */
+	byte cur_spot_flags;   /* 49 */
+	byte bvar_4A;          /* 4A */
+	byte bvar_4B;          /* 4B */
+	byte bvar_4C;          /* 4C */
+	byte bvar_4D;          /* 4D */
+	byte bvar_4E;          /* 4E */
+	byte bvar_4F;          /* 4F */
 
-	unsigned char bvar_50;          /* 50 */
-	unsigned char bvar_51;          /* 51 */
-	unsigned char bvar_52;          /* 52 */
-	unsigned char bvar_53;          /* 53 */
-	unsigned char bvar_54;          /* 54 */
-	unsigned char bvar_55;          /* 55 */
-	unsigned char bvar_56;          /* 56 */
-	unsigned char need_draw_spots;  /* 57 */
-	unsigned char bvar_58;          /* 58 */
-	unsigned char bvar_59;          /* 59 */
-	unsigned char psy_energy;       /* 5A */
-	unsigned char bvar_5B;          /* 5B */
-	unsigned char bvar_5C;          /* 5C */
-	unsigned char bvar_5D;          /* 5D */
-	unsigned char bvar_5E;          /* 5E */
-	unsigned char bvar_5F;          /* 5F */
+	byte bvar_50;          /* 50 */
+	byte bvar_51;          /* 51 */
+	byte bvar_52;          /* 52 */
+	byte bvar_53;          /* 53 */
+	byte bvar_54;          /* 54 */
+	byte bvar_55;          /* 55 */
+	byte bvar_56;          /* 56 */
+	byte need_draw_spots;  /* 57 */
+	byte bvar_58;          /* 58 */
+	byte bvar_59;          /* 59 */
+	byte psy_energy;       /* 5A */
+	byte bvar_5B;          /* 5B */
+	byte bvar_5C;          /* 5C */
+	byte bvar_5D;          /* 5D */
+	byte bvar_5E;          /* 5E */
+	byte bvar_5F;          /* 5F */
 
-	unsigned char bvar_60;          /* 60 */
-	unsigned char bvar_61;          /* 61 */
-	unsigned char bvar_62;          /* 62 */
-	unsigned char bvar_63;          /* 63 */
-	unsigned char bvar_64;          /* 64 */
-	unsigned char bvar_65;          /* 65 */
-	unsigned char bvar_66;          /* 66 */
-	unsigned char bvar_67;          /* 67 */
-	unsigned char zapstik_stolen;   /* 68 */
-	unsigned char bvar_69;          /* 69 */
-	unsigned char bvar_6A;          /* 6A */
-	unsigned char bvar_6B;          /* 6B */
-	unsigned char bvar_6C;          /* 6C */
-	unsigned char bvar_6D[4];       /* 6D */
+	byte bvar_60;          /* 60 */
+	byte bvar_61;          /* 61 */
+	byte bvar_62;          /* 62 */
+	byte bvar_63;          /* 63 */
+	byte bvar_64;          /* 64 */
+	byte bvar_65;          /* 65 */
+	byte bvar_66;          /* 66 */
+	byte bvar_67;          /* 67 */
+	byte zapstik_stolen;   /* 68 */
+	byte bvar_69;          /* 69 */
+	byte bvar_6A;          /* 6A */
+	byte bvar_6B;          /* 6B */
+	byte bvar_6C;          /* 6C */
+	byte bvar_6D[4];       /* 6D */
 } script_byte_vars_t;
 
 /*2-byte long vars, in BIG-endian order*/
 typedef struct script_word_vars_t {
-	unsigned short psi_cmds[6];         /*  0 */
-	unsigned short wvar_0C;             /*  C */
-	unsigned short wvar_0E;             /*  E */
-	unsigned short timer_ticks2;        /* 10 */
-	unsigned short zone_obj_cmds[15 * 5];   /* 12 */
-	unsigned short next_aspirant_cmd;   /* A8 */
-	unsigned short wvar_AA;             /* AA */
-	unsigned short wvar_AC;             /* AC */
-	unsigned short wvar_AE;             /* AE */
-	unsigned short wvar_B0;             /* B0 */
-	unsigned short wvar_B2;             /* B2 */
-	unsigned short wvar_B4;             /* B4 */
-	unsigned short next_protozorqs_cmd; /* B6 */
-	unsigned short wvar_B8;             /* B8 */
+	uint16 psi_cmds[6];         /*  0 */
+	uint16 wvar_0C;             /*  C */
+	uint16 wvar_0E;             /*  E */
+	uint16 timer_ticks2;        /* 10 */
+	uint16 zone_obj_cmds[15 * 5];   /* 12 */
+	uint16 next_aspirant_cmd;   /* A8 */
+	uint16 wvar_AA;             /* AA */
+	uint16 wvar_AC;             /* AC */
+	uint16 wvar_AE;             /* AE */
+	uint16 wvar_B0;             /* B0 */
+	uint16 wvar_B2;             /* B2 */
+	uint16 wvar_B4;             /* B4 */
+	uint16 next_protozorqs_cmd; /* B6 */
+	uint16 wvar_B8;             /* B8 */
 } script_word_vars_t;
 
 extern void *script_vars[ScrPools_MAX];
@@ -175,11 +175,11 @@ extern script_byte_vars_t script_byte_vars;
 
 /*TODO: manipulated from script, do not change*/
 typedef struct item_t {
-	unsigned char flags;
-	unsigned char area;		/*item location*/
-	unsigned char sprite;   /*item sprite index*/
-	unsigned char name;     /*item name index (relative)*/
-	unsigned short command; /*TODO: warning! in native format, check if never accessed from scripts*/
+	byte flags;
+	byte area;		/*item location*/
+	byte sprite;   /*item sprite index*/
+	byte name;     /*item name index (relative)*/
+	uint16 command; /*TODO: warning! in native format, check if never accessed from scripts*/
 } item_t;
 
 #define MAX_INV_ITEMS 63
@@ -188,32 +188,32 @@ extern item_t inventory_items[MAX_INV_ITEMS];
 #define PERS_MAX 41
 extern pers_t pers_list[PERS_MAX];
 
-extern unsigned char *script_stack[5 * 2];
-extern unsigned char **script_stack_ptr;
+extern byte *script_stack[5 * 2];
+extern byte **script_stack_ptr;
 
 extern pers_t *vort_ptr;
 
 #define SPECIAL_COMMANDS_MAX 20
-extern unsigned short menu_commands_12[SPECIAL_COMMANDS_MAX];
-extern unsigned short menu_commands_22[SPECIAL_COMMANDS_MAX];
-extern unsigned short menu_commands_24[SPECIAL_COMMANDS_MAX];
-extern unsigned short menu_commands_23[SPECIAL_COMMANDS_MAX];
+extern uint16 menu_commands_12[SPECIAL_COMMANDS_MAX];
+extern uint16 menu_commands_22[SPECIAL_COMMANDS_MAX];
+extern uint16 menu_commands_24[SPECIAL_COMMANDS_MAX];
+extern uint16 menu_commands_23[SPECIAL_COMMANDS_MAX];
 
-extern unsigned short fight_pers_ofs;
+extern uint16 fight_pers_ofs;
 
-extern unsigned char wait_delta;
+extern byte wait_delta;
 
-extern unsigned char rand_seed;
-unsigned char Rand(void);
-unsigned short RandW(void);
+extern byte rand_seed;
+byte Rand(void);
+uint16 RandW(void);
 
-extern unsigned short the_command;
+extern uint16 the_command;
 
-unsigned char *GetScriptSubroutine(unsigned int index);
+byte *GetScriptSubroutine(unsigned int index);
 
 unsigned int RunCommand(void);
 unsigned int RunCommandKeepSp(void);
 
-unsigned short Swap16(unsigned short x);
+uint16 Swap16(uint16 x);
 
 #endif

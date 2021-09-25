@@ -1,11 +1,11 @@
 #ifndef _INVENT_H_
 #define _INVENT_H_
 
-extern unsigned char inv_count;
-extern unsigned char inv_bgcolor;
+extern byte inv_count;
+extern byte inv_bgcolor;
 
-void DrawInventoryBox(unsigned short filtermask, unsigned short filtervalue);
+void DrawInventoryBox(uint16 filtermask, uint16 filtervalue);
 
-void OpenInventory(unsigned short filtermask, unsigned short filtervalue);
+void OpenInventory(uint16 filtermask, uint16 filtervalue);
 
 #endif

@@ -11,9 +11,9 @@ extern int LoadSplash(const char *filename);
 Get bank entry
 TODO: port SeekToString to this routine
 */
-unsigned char *SeekToEntry(unsigned char *bank, unsigned int num, unsigned char **end) {
-	unsigned char len;
-	unsigned char *p = bank;
+byte *SeekToEntry(byte *bank, unsigned int num, byte **end) {
+	byte len;
+	byte *p = bank;
 
 	while (num--) {
 		len = *p;
@@ -24,9 +24,9 @@ unsigned char *SeekToEntry(unsigned char *bank, unsigned int num, unsigned char 
 	return p + 1;
 }
 
-unsigned char *SeekToEntryW(unsigned char *bank, unsigned int num, unsigned char **end) {
+byte *SeekToEntryW(byte *bank, unsigned int num, byte **end) {
 	unsigned int len;
-	unsigned char *p = bank;
+	byte *p = bank;
 
 	while (num--) {
 		len = p[0] | (p[1] << 8);
@@ -37,7 +37,7 @@ unsigned char *SeekToEntryW(unsigned char *bank, unsigned int num, unsigned char
 	return p + 2;
 }
 
-unsigned int LoadFile(const char *filename, unsigned char *buffer) {
+unsigned int LoadFile(const char *filename, byte *buffer) {
 	int f;
 	int rlen;
 	f = open(filename, O_RDONLY | O_BINARY);
@@ -50,7 +50,7 @@ unsigned int LoadFile(const char *filename, unsigned char *buffer) {
 	return (unsigned int)rlen;
 }
 
-unsigned int SaveFile(char *filename, unsigned char *buffer, unsigned int size) {
+unsigned int SaveFile(char *filename, byte *buffer, unsigned int size) {
 	int f;
 	int wlen;
 	f = open(filename, O_RDONLY | O_BINARY);
@@ -73,17 +73,17 @@ int LoadFilesList(ResEntry_t *entries) {
 }
 
 
-unsigned char arpla_data[RES_ARPLA_MAX];
-unsigned char aleat_data[RES_ALEAT_MAX];
-unsigned char icone_data[RES_ICONE_MAX];
-unsigned char souco_data[RES_SOUCO_MAX];
-unsigned char souri_data[RES_SOURI_MAX];
-unsigned char mursm_data[RES_MURSM_MAX];
-unsigned char gauss_data[RES_GAUSS_MAX];
-unsigned char lutin_data[RES_LUTIN_MAX];
-unsigned char anima_data[RES_ANIMA_MAX];
-unsigned char anico_data[RES_ANICO_MAX];
-unsigned char zones_data[RES_ZONES_MAX];
+byte arpla_data[RES_ARPLA_MAX];
+byte aleat_data[RES_ALEAT_MAX];
+byte icone_data[RES_ICONE_MAX];
+byte souco_data[RES_SOUCO_MAX];
+byte souri_data[RES_SOURI_MAX];
+byte mursm_data[RES_MURSM_MAX];
+byte gauss_data[RES_GAUSS_MAX];
+byte lutin_data[RES_LUTIN_MAX];
+byte anima_data[RES_ANIMA_MAX];
+byte anico_data[RES_ANICO_MAX];
+byte zones_data[RES_ZONES_MAX];
 
 ResEntry_t res_static[] = {
 	{"ARPLA.BIN", arpla_data},

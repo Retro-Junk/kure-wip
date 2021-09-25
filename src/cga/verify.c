@@ -22,7 +22,8 @@
 
 #else
 
-char short_size_check[1 - 2*(sizeof(short) != 2)];
+char byte_size_check[1 - 2*(sizeof(byte) != 1)];
+char short_size_check[1 - 2*(sizeof(int16) != 2)];
 char rect_size_check[1 - 2*(sizeof(rect_t) != 4)];
 char spot_size_check[1 - 2*(sizeof(spot_t) != 8)];
 char pers_size_check[1 - 2*(sizeof(pers_t) != 5)];

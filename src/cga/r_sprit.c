@@ -1,3 +1,4 @@
+#include "common.h"
 #include "resdata.h"
 
-unsigned char sprit_data[RES_SPRIT_MAX];
+byte sprit_data[RES_SPRIT_MAX];

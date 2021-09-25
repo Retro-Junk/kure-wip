@@ -14,10 +14,10 @@
 	}
 
 typedef struct rect_t {
-	unsigned char sx;
-	unsigned char ex;
-	unsigned char sy;
-	unsigned char ey;
+	byte sx;
+	byte ex;
+	byte sy;
+	byte ey;
 } rect_t;
 
 #if 0

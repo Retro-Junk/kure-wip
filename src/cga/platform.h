@@ -3,6 +3,12 @@
 
 #if defined(__WATCOMC__)
 
+typedef unsigned char byte;
+typedef signed char int8;
+typedef unsigned char uint8;
+typedef signed short int16;
+typedef unsigned short uint16;
+
 #ifdef __386__
 #include <i86.h>
 #endif
@@ -16,6 +22,12 @@
 #define INTERRUPT __interrupt __far
 
 #elif defined(__TURBOC__)
+
+typedef unsigned char byte;
+typedef signed char int8;
+typedef unsigned char uint8;
+typedef signed short int16;
+typedef unsigned short uint16;
 
 #define INTERRUPT interrupt
 
