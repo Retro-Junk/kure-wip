@@ -46,6 +46,6 @@ Original game bugs:
 1. Actions menu for rope in DeProf shows two "Inspect" choices with different actions
 2. SCR_2D_Wait ignores specified delay, always waits for 4 secs
 3. Trade with Skull Trader while having only a skull will cause lost of the skull?
-4. Entering The Wall's side doors then return back leaves strange black patch on the right half-open door
+4. US-FIXED -- Entering The Wall's side doors then return back leaves strange black patch on the right half-open door
 5. Some graphics objects seems to be missing a number of pixels on first or last line (up right of trapdoor in The Noose, bottom right in the cavern)
 6. When zap-killed by zorq, its zoomed portrait is drawn, but then immediately replaced with game over sequence

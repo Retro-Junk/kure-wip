@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <dos.h>
 #ifdef __WATCOMC__
 #include <i86.h>
@@ -23,6 +24,7 @@
 #include "print.h"
 #include "dialog.h"
 #include "menu.h"
+#include "ifgm.h"
 
 uint16 cpu_speed_delay;
 
@@ -31,6 +33,34 @@ Prompt user to insert disk #2 to any drive
 */
 void AskDisk2(void) {
 	DrawMessage(SeekToString(vepci_data, 179), frontbuffer);
+}
+
+/*
+Show game exit confirmation dialog and get user's input
+*/
+int AskQuitGame(void) {
+	int quit = 0;
+#ifdef VERSION_USA
+	byte *msg = SeekToString(desci_data, 411);	/*DO YOU WANT TO QUIT ? (Y OR N).*/
+	char_draw_max_width = 32;
+	draw_x = 1;
+	draw_y = 188;
+	CGA_DrawTextBox(msg, frontbuffer);
+	for (;;) {
+		byte c = GetKeyScan();
+		if (c == 0x15) {	/* Y */
+			quit = 1;
+			break;
+		}
+		if (c == 0x31) {	/* N */
+			quit = 0;
+			break;
+		}
+	}
+	CGA_CopyScreenBlock(backbuffer, char_draw_max_width + 2, char_draw_coords_y - draw_y + 8, frontbuffer, CGA_CalcXY_p(draw_x, draw_y));
+#endif
+	/*EU version comes without requited text string*/
+	return quit;
 }
 
 void SaveToFile(char *filename, void *data, unsigned int size) {
@@ -162,6 +192,7 @@ process:;
 
 void ExitGame(void) {
 	SwitchToTextMode();
+	UninitTimer();
 	exit(0);
 }
 
@@ -174,11 +205,28 @@ extern TheEnd(void);
 void main(void) {
 	byte c;
 
+	/*TODO: DetectCPU*/
+
+	IFGM_Init();
+
 	SwitchToGraphicsMode();
 
+	/* Install timer callback */
+	InitTimer();
+
+#ifdef VERSION_USA
+	/* Load title screen */
+	if (!LoadSplash("PRESCGA.BIN"))
+		ExitGame();
+
+	if (ifgm_loaded) {
+		/*TODO*/
+	}
+#else
 	/* Load title screen */
 	if (!LoadSplash("PRES.BIN"))
 		ExitGame();
+#endif
 
 	/* Select intense cyan-mageta palette */
 	CGA_ColorSelect(0x30);
@@ -186,11 +234,14 @@ void main(void) {
 	/* Show the title screen */
 	CGA_BackBufferToRealFull();
 
-#ifdef COPYPROT
-	/* Check if a valid floppy disk is present in any drive */
-	if (!CheckCopyProtection()) for (;;) ;
-#endif
+#ifdef VERSION_USA
+	if (ifgm_loaded) {
+		/*TODO*/
+	}
 
+	/* Force English language */
+	c = 'E';
+#else
 	/* Load language selection screen */
 	if (!LoadSplash("DRAP.BIN"))
 		ExitGame();
@@ -207,6 +258,7 @@ void main(void) {
 		if (c > 'F')
 			c -= ' ';
 	} while (c < 'D' || c > 'F');
+#endif
 
 	/* Patch resource names for choosen language */
 	res_texts[0].name[4] = c;
@@ -214,7 +266,9 @@ void main(void) {
 	res_desci[0].name[4] = c;
 	res_diali[0].name[4] = c;
 
+#ifndef VERSION_USA
 	CGA_BackBufferToRealFull();
+#endif
 
 	/* Load script and other static resources */
 	/* Those are normally embedded in the executable, but here we load extracted ones*/
@@ -225,12 +279,12 @@ void main(void) {
 	if (!LoadVepciData() || !LoadDesciData() || !LoadDialiData())
 		ExitGame();
 
+	/* Detect/Initialize input device */
+	InitInput();
+
 	/* Load graphics resources */
 	while (!LoadFond() || !LoadSpritesData() || !LoadPersData())
 		AskDisk2();
-
-	/* Detect/Initialize input device */
-	InitInput();
 
 	/*TODO: is this neccessary?*/
 	CGA_BackBufferToRealFull();
@@ -238,11 +292,14 @@ void main(void) {
 	/* Create clean game state snapshot */
 	SaveRestartGame();
 
-	/* Install timer callback */
-	InitTimer();
-
 	/* Detect CPU speed for delay routines */
 	cpu_speed_delay = BenchmarkCpu() / 8;
+
+#ifdef VERSION_USA
+	if (ifgm_loaded) {
+		/*TODO*/
+	}
+#endif
 
 	/*restart game from here*/
 restart:;
@@ -264,6 +321,9 @@ restart:;
 	/*bypass characters introduction*/
 	script_byte_vars.load_flag = DEBUG_SKIP_INTRO;
 #endif
+
+	/* Discard all pending input */
+	ResetInput();
 
 	/* Play introduction sequence and initialize game */
 	the_command = 0xC001;
@@ -288,7 +348,6 @@ restart:;
 
 	/* Release hardware */
 	UninitInput();
-	UninitTimer();
 
 	ExitGame();
 }

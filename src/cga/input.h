@@ -12,13 +12,16 @@ extern byte key_held;
 
 byte ReadKeyboardChar(void);
 void ClearKeyboard(void);
+byte GetKeyScan(void);
 
-byte PollMouse(void);
+byte PollMouse(unsigned int *curs_x, uint8 *curs_y);
 byte PollKeyboard(void);
 void SetInputButtons(byte keys);
 
 void PollInput(void);
 void ProcessInput(void);
+void PollInputButtonsOnly(void);
+void ResetInput(void);
 
 void InitInput(void);
 void UninitInput(void);

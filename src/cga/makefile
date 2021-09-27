@@ -3,7 +3,7 @@ LINK = tlink /c /x /v
 LIB = tlib
 OBJS = resdata.obj cga.obj anim.obj decompr.obj cursor.obj input.obj \
 	 room.obj invent.obj print.obj dialog.obj portrait.obj menu.obj \
-	 timer.obj sound.obj savegame.obj kult.obj script.obj
+	 timer.obj sound.obj savegame.obj ifgm.obj kult.obj script.obj
 
 kult.exe: alldata.lib $(OBJS)
 	$(LINK) $(CLIB)\c0h @kult.lnk,$*,,alldata $(CLIB)\ch
@@ -35,6 +35,7 @@ sound.obj: sound.c common.h sound.h
 timer.obj: timer.c common.h timer.h cga.h
 script.obj: script.c common.h script.h cga.h resdata.h
 savegame.obj: savegame.c common.h savegame.h script.h room.h dialog.h resdata.h
+ifgm.obj: ifgm.c common.h ifgm.h
 
 .c.obj:
 	$(CC) $<

@@ -2,6 +2,7 @@
 #include <conio.h>
 #include "common.h"
 #include "sound.h"
+#include "ifgm.h"
 
 typedef struct pcsample_t {
 	unsigned short repeat;
@@ -94,6 +95,9 @@ byte sounds_table[kMaxSounds][3] = {
 
 void PlaySound(byte index) {
 	int i;
+	if (IFGM_PlaySound(index))
+		return;
+
 	for (i = 0; i < kMaxSounds; i++) {
 		if (sounds_table[i][0] == index
 		        || sounds_table[i][1] == index

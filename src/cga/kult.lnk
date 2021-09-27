@@ -12,6 +12,7 @@ portrait.obj+
 menu.obj+
 timer.obj+
 sound.obj+
+ifgm.obj+
 savegame.obj+
 kult.obj+
 script.obj

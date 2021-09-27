@@ -3,6 +3,7 @@
 #include "cga.h"
 #include "script.h"
 #include "resdata.h"
+#include "portrait.h"
 
 void AnimateGauss(byte *target) {
 	byte *sprite;
@@ -18,6 +19,7 @@ void (INTERRUPT *old_timer_isr)(void);
                
 void INTERRUPT TimerIsr() {
 	disable();
+	vblank_ticks++;
 	script_byte_vars.timer_ticks++;
 	if (!script_byte_vars.game_paused) {
 		if (script_byte_vars.timer_ticks % 16 == 0) {
@@ -27,6 +29,7 @@ void INTERRUPT TimerIsr() {
 #endif
 		}
 	}
+	IFGM_Poll();
 	enable();
 }
 

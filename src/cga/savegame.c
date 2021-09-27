@@ -8,6 +8,38 @@
 #include "cga.h"
 #include "room.h"
 #include "dialog.h"
+#include "room.h"
+
+static const char restart_name[] = "CLEARx.BIN";
+
+#ifdef VERSION_USA
+static const char savegame_name[] = "SCENACx.BIN";
+#else
+static const char savegame_name[] = "SCENAx.BIN";
+#endif
+
+#ifdef VERSION_USA
+
+#define CGA_SAVE_BEG_OFS 0x769B
+#define CGA_SAVE_END_OFS 0x9EDA
+
+#define CGA_SAVE_WORD_VARS_OFS 0x79C1
+#define CGA_SAVE_BYTE_VARS_OFS 0x7B33
+#define CGA_SAVE_INVENTORY_OFS 0x7762
+#define CGA_SAVE_ZONES_OFS     0x7BA4
+#define CGA_SAVE_PERS_OFS      0x78E2
+#define CGA_SAVE_STACK_OFS     0x76DF
+#define CGA_SAVE_SPRITES_OFS   0x5264
+#define CGA_SAVE_SPRLIST_OFS   0x76AD
+#define CGA_SAVE_SPRBUFF_OFS   0x4C68
+#define CGA_SAVE_ARPLA_OFS     0x26F6
+#define CGA_SAVE_SCRSTACK_OFS  0x76DF
+#define CGA_SAVE_TEMPL_OFS     0x1AC7
+#define CGA_SAVE_VORTANIMS_OFS 0xA7B7
+#define CGA_SAVE_TURKEYANIMS_OFS 0xA8FC
+#define CGA_SAVE_TIMEDSEQ_OFS  0xA96E
+
+#else
 
 #define CGA_SAVE_BEG_OFS 0x751E
 #define CGA_SAVE_END_OFS 0x9D5D
@@ -27,6 +59,8 @@
 #define CGA_SAVE_VORTANIMS_OFS 0xA609
 #define CGA_SAVE_TURKEYANIMS_OFS 0xA74E
 #define CGA_SAVE_TIMEDSEQ_OFS  0xA7C0
+
+#endif
 
 #define SAVEADDR(value, base, nativesize, origsize, origbase)   \
 	((value) ? LE16(((((byte*)(value)) - (byte*)(base)) / nativesize) * origsize + origbase) : 0)
@@ -534,7 +568,7 @@ int LoadScena(void) {
 
 	script_byte_vars.game_paused = 1;
 
-	f = open("SCENAx.BIN", O_RDONLY | O_BINARY);
+	f = open(savegame_name, O_RDONLY | O_BINARY);
 	if (f == -1) {
 		script_byte_vars.game_paused = 0;
 		return 1;   /*error*/
@@ -564,8 +598,11 @@ int SaveScena(void) {
 
 	script_byte_vars.game_paused = 1;
 	BlitSpritesToBackBuffer();
+	command_hint = 100;
+	DrawCommandHint();
+	ShowCommandHint(frontbuffer);
 
-	f = open("SCENAx.BIN", O_CREAT | O_WRONLY | O_BINARY);
+	f = open(savegame_name, O_CREAT | O_WRONLY | O_BINARY);
 	if (f == -1) {
 		script_byte_vars.game_paused = 0;
 		return 1;   /*error*/
@@ -574,6 +611,10 @@ int SaveScena(void) {
 	res = WriteSaveData(f, 0);
 
 	close(f);
+
+	if(res != 0)
+		unlink(savegame_name);
+
 	script_byte_vars.game_paused = 0;
 	return res;
 }
@@ -581,7 +622,7 @@ int SaveScena(void) {
 void SaveRestartGame(void) {
 	int f;
 
-	f = open("CLEARx.BIN", O_CREAT | O_WRONLY | O_BINARY);
+	f = open(restart_name, O_CREAT | O_WRONLY | O_BINARY);
 	if (f == -1) {
 		return;   /*error*/
 	}
@@ -600,7 +641,7 @@ void RestartGame(void) {
 	int res;
 
 	for (;; AskDisk2()) {
-		f = open("CLEARx.BIN", O_RDONLY | O_BINARY);
+		f = open(restart_name, O_RDONLY | O_BINARY);
 		if (f != -1) {
 			res = ReadSaveData(f, 1);
 			close(f);
