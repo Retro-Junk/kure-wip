@@ -67,5 +67,5 @@ TEMPL.BIN    - game script code
 Misc:
 
 CLEAR.BIN    - clean game state snapshot, autocreated. used to restart the game
-SOUCO.BIN    - ???
+SOUCO.BIN    - eding animation script
 ALEAT.BIN    - random noise for PRNG

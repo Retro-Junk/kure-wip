@@ -1,0 +1,123 @@
+
+Opcode  Mnemonic                        EU-CGA  EU-HERC   US-CGA  US-HERC   US-EGA  US-TAN  EU-ATA    EU-AMI  US-ATA  US-AMI
+0x01    KindAspirantTrade                  +       +        +        +        +               +         +
+0x02    RudeAspirantTrade                  +       +        +        +        +               +         +
+0x03    DrawItemBox                        +       +        +        +        +               +         +
+0x04    StealZapstik                       +       +        +        +        +               +         +
+0x05    DrawPortraitLiftRight              +                +        +        +               +         +
+0x06    DrawPortraitLiftLeft               +                +        +        +               +         +
+0x07    DrawPortraitLiftDown               +                +        +        +               +         +
+0x08    DrawPortraitLiftUp                 +                +        +        +               +         +
+0x09    DrawPortrait                       +                +        +        +               +         +
+0x0A    DrawPortrait_0A                 [1:0x9]          [1:0x9]  [1:0x9]  [1:0x9]            +       [1:0x9]
+0x0B    DrawPortraitTwist                  +                +        +        +               +         +
+0x0C    DrawPortraitArc                    +                +        +        +               +         +
+0x0D    DrawPortraitDotEffect              +                +        +        +               +         +
+0x0E    DrawPortraitZoomIn                 +                +        +        +               +         +
+0x0F    ?? unused ??                       x                x        x        x               x         x
+0x10    DrawPortraitZoomed                 +                +        +        +               +         +
+0x11    DrawRoomObject                     +                +        +        +               +         +
+0x12    Chain                              +                +        +        +               +         +
+0x13    RedrawRoomStatics                  +                +        +        +               +         +
+0x14    DrawDesciText                      +                +        +        +               +         +
+0x15    SelectSpot                         +                +        +        +               +         +
+0x16    DrawDeathAnim                      +                +        +        +               +         +
+0x17    DrawPersonThoughtBubbleDialog      +                +        +        +               +         +
+0x18    AnimPortrait                       +                +        +        +               +         +
+0x19    HidePortraitLiftLeft               +                +        +        +               +         +
+0x1A    HidePortraitLiftRight              +                +        +        +               +         +
+0x1B    HidePortraitLiftUp                 +                +        +        +               +         +
+0x1C    HidePortraitLiftDown               +                +        +        +               +         +
+0x1D    HidePortrait_1D                 [2:0x23]         [2:0x23] [2:0x23] [2:0x23]           +         +
+0x1E    HidePortraitTwist                  +                +        +        +               +         +
+0x1F    HidePortraitArc                    +                +        +        +               +         +
+0x20    HidePortraitDots                   +                +        +        +               +         +
+0x21    HidePortrait_21                  [2:0x23]        [2:0x23] [2:0x23] [2:0x23]         [2:0x23]  [2:0x23]
+0x22    HidePortraitShatter                +                +        +     [4:0x1C]           +         + 
+0x23    HidePortrait                       +                +        +        +               +         + 
+0x24    PopAllPortraits                    +                +        +        +               +         + 
+0x25    ChangeZoneOnly                     +                +        +        +               +         + 
+0x26    GameOver                           +                +        +        +               +         +
+0x27    DrawGaussBubble                    +                +        +        +               +         +
+0x28    MenuLoop                           +                +        +        +               +         +
+0x29    DrawDialiBubble                    +                +        +        +               +         +
+0x2A    PopBubble                          +                +        +        +               +         +
+0x2B    PopAllBubbles                      +                +        +        +               +         +
+0x2C    Wait4                              +                +     [7:0x2E]    +               +         +
+0x2D    Wait                            [5:BUG]          [5:BUG]  [8:0x2E] [5:BUG]            +         +
+0x2E    PromptWait                         +                +        +        +               +         +
+0x2F    LootAspirantsItem                  +                +        +        +               +         +
+0x30    Fight                              +                +        +        +               +         +
+0x31    Fight2                             +                +        +        +               +         +
+0x32    FightWin                           +                +        +        +               +         +
+0x33    Jump                               +                +        +        +               +         +
+0x34    Call                               +                +        +        +               +         +
+0x35    Ret                                +                +        +        +               +         +
+0x36    ChangeZone                         +                +        +        +               +         + 
+0x37    DrawDesciTextBox                   +                +        +        +               +         + 
+0x38    RunAnim                            +                +        +        +               +         + 
+0x39    AnimRoomDoorOpen                   +                +        +        +               +         + 
+0x3A    AnimRoomDoorClose                  +                +        +        +               +         + 
+0x3B    MathExpr                           +                +        +        +               +         + 
+0x3C    CondExpr                           +                +        +        +               +         + 
+0x3D    ActionsMenu                        +                +        +        +               +         + 
+0x3E    TheWallAdvance                     +                +        +        +               +         + 
+0x3F    HidePortrait_3F                 [3:0x23]         [3:0x23] [3:0x23] [3:0x23]        [3:0x23]  [3:0x23]   
+0x40    PopAllTextBoxes                    +                +        +        +               +         + 
+0x41    LiftHand                           +                +        +        +               +         + 
+0x42    LoadZone                           +                +        +        +               +         + 
+0x43    RefreshZone                        +                +        +        +               +         +
+0x44    BackBufferToScreen                 +                +        +        +               +         +
+0x45    DeProfundisRoomEntry               +                +        +        +               +         +
+0x46    DeProfundisLowerHook               +                +        +        +               +         +
+0x47    DeProfundisRiseMonster             +                +        +        +               +         +
+0x48    DeProfundisLowerMonster            +                +        +        +               +         +
+0x49    DeProfundisRiseHook                +                +        +        +               +         +
+0x4A    ?? unused ??                       x                x        x        x               x         x
+0x4B    ProtoDropZapstik                   +                +        +        +               +         +
+0x4C    DrawPersons                        +                +        +        +               +         +
+0x4D    PriorityCommand                    +                +        +        +               +         +
+0x4E    CurrentItemFlyToRoom               +                +        +        +               +         +
+0x4F    CurrentItemFlyToInventory          +                +        +        +               +         +
+0x50    ItemFlyToInventory                 +                +        +        +               +         +
+0x51    ItemTrade                          +                +        +        +               +         +
+0x52    RefreshSpritesData                 +                +        +        +               +         +
+0x53    FindInvItem                        +                +        +        +               +         +
+0x54    DotFadeRoom                        +                +        +        +               +         +
+0x55    DrawRoomItemsIndicator             +                +        +        +               +         +
+0x56    MorphRoom98                        +                +        +        +               +         +
+0x57    ShowCharacterSprite                +                +        +        +               +         +
+0x58    DrawCharacterSprite                +                +        +        +               +         +
+0x59    BlitSpritesToBackBuffer            +                +        +        +               +         +
+0x5A    SelectPalette                      +                +        x        x               +         +
+0x5B    TheEnd                             +                +        +        +               +         +
+0x5C    ClearInventory                     +                +        +        +               +         +
+0x5D    DropWeapons                        +                +        +        +               +         +
+0x5E    SelectTempPalette                  +                +        x        x               +         +
+0x5F    DrawRoomObjectBack                 +                +        +        +               +         +
+0x60    ReviveCadaver                      +                +        +        +               +         +
+0x61    DrawPersonBubbleDialog             +                +        +        +               +         +
+0x62    PsiReaction                        +                +        +        +               +         +
+0x63    LiftSpot6                          +                +        +        +               +         +
+0x64    DrawBoxAroundSpot                  +                +        +        +               +         +
+0x65    DeProfundisMovePlatform            +                +        +        +               +         +
+0x66    DeProfundisRideToExit              +                +        +        +               +         +
+0x67    Unused67 (LoadSfx?)                x                x        x        x               +         +
+0x68    PlaySfx                            x                +        +        +               +         +
+0x69    PlaySound                          +                +        +        +               +    [6:new arg]
+0x6A    StopSound                          x                x        x        x               +         +
+0x6B    RedrawRoomStaticScrn              ---              ---      ---       +              ---       ---
+0xFF    End                                +                +        +        +               +         +
+
++ - implemented
+x - does nothing
+- - unavailable
+
+[1] - Stubbed to regular DrawPortrait (opcode 0x09)
+[2] - Stubbed to regular HidePortrait (opcode 0x23)
+[3] - Stubbed to regular HidePortrait (opcode 0x23)
+[4] - Stubbed to regular HidePortraitLiftDown (opcode 0x1C)
+[5] - Implementation is buggy, always waits for 4 seconds regardless specified value (maybe not a bug, see [8])
+[6] - Extra argument added to the opcode parameters
+[7] - Stubbed to regular PromptWait (opcode 0x2E)
+[8] - Stubbed to regular PromptWait (opcode 0x2E), wait counter is ignored
