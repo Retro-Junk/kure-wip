@@ -1,8 +1,8 @@
 Graphics formats used by the game
 
-The game uses three major formats for its graphics: palettes, splashes, sprites and cursors.
+The game uses four major formats for its graphics: palettes, splashes, sprites and cursors.
 Palettes define actual colors used for all other graphics resources.
-Splashes are full-screen images used for intro, language selection or playfield background. Typically stored in platform-native framebuffer format.
+Splashes are full-screen images used for intro, language selection and playfield background. Typically stored in platform-native framebuffer format.
 Sprites are heavily used for all ingame graphics, including room's background decorations. Sprites also support transparency.
 Cursors are special kind of sprites used for the mouse pointer cursor. They support transparency and recoloring.
 
@@ -47,13 +47,13 @@ TODO
 2. Atari
 2.1 Atari palettes
 Atari uses 3 bits per color component precision, so single palette entry occupy 3+3+3 bits. Actual entry is stored as a 16-bits big-endian word,
-where upper 4 bits are unused.
+where upper 4 bits are unused and each component is padded to 4 bits.
 
 color = 0000'0RRR'0GGG'0BBB
 
 Game uses 16-color palettes, where color 0 is black/transparent, next 5 may be dynamically selected from 20 predefined sets
 and remaining 10 colors are static.
-Dynamic color sets are hardcoded in the executable file, static colors initialized from splashes (DRAP.BIN)
+Dynamic color sets are hardcoded in the executable file, static colors initialized from splashes (FOND.PI1)
 
 2.2 Atari splashes
 Files: DRAP.PI1, FOND.PI1, PRES.PI1
@@ -84,7 +84,8 @@ CGA's standard high-intensity Black-Cyan-Magenta-White palette is used.
 
 3.2 CGA splashes
 Files: DRAP.BIN, FOND.BIN, PRES.BIN, PRESCGA.BIN
-Stored in CGA-native framebuffer format. CGA uses two pages for storing even and odd scanlines respectively. Each scanline holds 320 pixels,
+The files are compressed with LZ78 variant and need to be unpacked first.
+Data is stored in CGA-native framebuffer format. CGA uses two pages for storing even and odd scanlines respectively. Each scanline holds 320 pixels,
 packed as 2-bit values, 4 pixels per byte. Pixels counted from upper two-bits slice of a byte.
 Single page occupy 8192 bytes, where 8000 (= 320/4 * 200/2) are actual pixels data followed by 192 bytes of padding.
 
