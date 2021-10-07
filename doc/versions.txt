@@ -1,0 +1,191 @@
+Game versions differences
+
+Amiga EU:
+16-color graphics with palette effects
+Digitized sounds
+Intro music track
+English, German and French languages
+
+Amiga US:
+16-color graphics with palette effects
+Digitized sounds
+Intro music track
+English language only
+
+Atari ST EU:
+16-color graphics with palette effects
+Digitized sounds
+English, German and French languages
+
+Atari ST US:
+Wanted!
+
+PC EU
+4-color CGA or monochrome Hercules graphics (on Hercules doubled horizontal resolution is used for dithering effect)
+PC-speaker sounds (beeps and chirps)
+English, German and French languages (plus unselectable Spanish language?)
+
+PC US
+4-color CGA or monochrome Hercules graphics (on Hercules doubled horizontal resolution is used for dithering effect)
+16-color EGA or Tandy graphics (no palette effects), some visual effects removed
+PC-speaker sounds
+Adlib FM sounds and ambients
+English language only
+
+
+List of files required to play the game
+
+Amiga EU Floppy (3-language version)
+tldr: *.BIN, KULT
+
+0.BIN
+1.BIN
+2.BIN
+3.BIN
+4.BIN
+5.BIN
+6.BIN
+7.BIN
+A.BIN
+B.BIN
+BRUIT.BIN
+DESCD.BIN
+DESCE.BIN
+DESCF.BIN
+DIALD.BIN
+DIALE.BIN
+DIALF.BIN
+DRAP.BIN
+FOND.BIN
+KULT
+MOTSD.BIN
+MOTSE.BIN
+MOTSF.BIN
+MUSIQ.BIN
+PRES.BIN
+PUZZL.BIN
+SOURI.BIN
+SPRIT.BIN
+VERBD.BIN
+VERBE.BIN
+VERBF.BIN
+
+
+Amiga US Floppy
+tldr: *.BIN, KULT, INTRO.PIA
+
+0.BIN
+1.BIN
+2.BIN
+3.BIN
+4.BIN
+5.BIN
+6.BIN
+7.BIN
+A.BIN
+B.BIN
+BRUIT.BIN
+FOND.BIN
+INTRO.PIA
+KULT
+MUSIQ.BIN
+PRES.BIN
+PUZZL.BIN
+SOURI.BIN
+SPRIT.BIN
+
+
+Atari EU Floppy (3-language version)
+tldr: *.BIN, *.PI1, KULT.PRG
+
+Disk 1/2:
+DESCD.BIN
+DESCE.BIN
+DESCF.BIN
+DIALD.BIN
+DIALE.BIN
+DIALF.BIN
+DRAP.PI1
+KULT.PRG
+MOTSD.BIN
+MOTSE.BIN
+MOTSF.BIN
+PRES.PI1
+VERBD.BIN
+VERBE.BIN
+VERBF.BIN
+
+Disk 2/2:
+BRUIT.BIN
+ECHE0.BIN
+ECHE1.BIN
+ECHE2.BIN
+ECHE3.BIN
+ECHE4.BIN
+ECHE5.BIN
+ECHE6.BIN
+ECHE7.BIN
+FOND.PI1
+PUZZL.BIN
+
+
+PC EU Floppy (3-language version, CGA/Hercules)
+tldr: *.BIN, ERE.PXI
+
+DESCD.BIN
+DESCE.BIN
+DESCF.BIN
+DESCS.BIN
+DIALD.BIN
+DIALE.BIN
+DIALF.BIN
+DIALS.BIN
+DRAP.BIN
+ERE.PXI
+FOND.BIN
+MOTSD.BIN
+MOTSE.BIN
+MOTSF.BIN
+PERS1.BIN
+PERS2.BIN
+PRES.BIN
+PUZZL.BIN
+SPRIT.BIN
+VEPCD.BIN
+VEPCE.BIN
+VEPCF.BIN
+
+
+PC US Floppy (single language, CGA/Hercules/EGA/Tandy) / Steam release
+tldr: *.BIN, *.EFF *.EGA, *.PXI, INTRO.ADD
+Warning: some releases floating around packaged with damaged .EFF files
+Correct set of files has BRUIT2.EFF with SHA1 hash 44e42e23faf4fd368234afc86215d2b94bba1a40
+
+BRUIT0.EFF
+BRUIT1.EFF
+BRUIT2.EFF
+BRUIT3.EFF
+BRUIT4.EFF
+BRUIT5.EFF
+BRUIT6.EFF
+BRUIT7.EFF
+DESCE.BIN
+DIALE.BIN
+FOND.BIN
+FOND.EGA
+INTRO.ADD
+KULT1.PXI
+KULT2.PXI
+MOTSE.BIN
+PERS1.BIN
+PERS2.BIN
+PERSO.EGA
+PRESCGA.BIN
+PRESEGA.EGA
+PUZZ1.EGA
+PUZZL.BIN
+PUZZL.EGA
+RESIDENT.EFF
+SPRIT.BIN
+SPRIT.EGA
+VEPCE.BIN
