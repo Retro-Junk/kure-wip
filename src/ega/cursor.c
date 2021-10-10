@@ -2,6 +2,7 @@
 #include "cursor.h"
 #include "resdata.h"
 #include "cga.h"
+#include "ega.h"
 
 byte cursor_color = 0;
 
@@ -27,9 +28,6 @@ byte cursor_y_shift;
 
 unsigned int cursor_x;
 byte cursor_y;
-byte cursor_backup[CURSOR_WIDTH_SPR * CURSOR_HEIGHT / CGA_BITS_PER_PIXEL];
-unsigned int last_cursor_draw_ofs = 0;
-unsigned int cursor_draw_ofs;
 
 /*
 Select cursor shape and its hotspot
@@ -37,119 +35,82 @@ Select cursor shape and its hotspot
 void SelectCursor(unsigned int num) {
 	cursor_x_shift = cursor_shifts[num][0];
 	cursor_y_shift = cursor_shifts[num][1];
-	cursor_shape = souri_data + num * CURSOR_WIDTH * CURSOR_HEIGHT * 2 / CGA_PIXELS_PER_BYTE;
+	cursor_shape = souri_data + num * CURSOR_WIDTH * CURSOR_HEIGHT * 2 / EGA_PIXELS_PER_BYTE;
 }
 
 /*
 Build cursor sprite for its current pixel-grained position
 */
 void UpdateCursor(void) {
-	byte *cursor, *sprite, *spr;
+	byte *cursor, *sprite;
 	byte cursor_bit_shift;
+	byte bitofs;
 	unsigned int x, y;
 	x = cursor_x - cursor_x_shift;
 	if ((signed int)x < 0) x = 0;
 	y = cursor_y - cursor_y_shift;
 	if ((signed int)y < 0) y = 0;
 
-	cursor_bit_shift = (x % 4) * 2;
-	cursor_draw_ofs = CGA_CalcXY_p(x / 4, y);
+	cursor_bit_shift = x % 8;
+	ega_cursor_params->drawoffs = EGA_CalcXY(x, y, &bitofs);
 
 	cursor = cursor_shape;
 	sprite = sprit_load_buffer;
 
-	if (cursor_bit_shift == 0) {
-		/*pixels*/
-		spr = sprite;
-		for (y = 0; y < CURSOR_HEIGHT; y++) {
-			for (x = 0; x < CURSOR_WIDTH / 4; x++) {
-				byte p = *cursor++;
-				spr[x * 2] = p;
-			}
-			spr[x * 2] = 0;
-			spr += 5 * 2;
+	for (y = 0;y < CURSOR_HEIGHT; y++) {
+		byte p0 = *cursor++;
+		byte p1 = *cursor++;
+		byte p2 = *cursor++;
+		byte p3 = *cursor++;
+		byte p4 = 0;
+		byte p5 = 0;
+		if (cursor_bit_shift != 0) {
+			p4 = p0 << (7 - cursor_bit_shift);
+			p5 = p2 << (7 - cursor_bit_shift);
+
+			p0 = (p0 >> cursor_bit_shift) | (p1 << (7 - cursor_bit_shift));
+			p1 = p1 >> cursor_bit_shift;
+
+			p2 = (p2 >> cursor_bit_shift) | (p3 << (7 - cursor_bit_shift));
+			p3 = p3 >> cursor_bit_shift;
 		}
 
-		/*mask*/
-		spr = sprite + 1;
-		for (y = 0; y < CURSOR_HEIGHT; y++) {
-			for (x = 0; x < CURSOR_WIDTH / 4; x++) {
-				byte p = *cursor++;
-				spr[x * 2] = p;
-			}
-			spr[x * 2] = 0xFF;
-			spr += 5 * 2;
-		}
-	} else {
-		spr = sprite;
-		for (y = 0; y < CURSOR_HEIGHT; y++) {
-			byte i;
-			byte p0 = *cursor++;
-			byte p1 = *cursor++;
-			byte p2 = *cursor++;
-			byte p3 = *cursor++;
-			byte p4 = 0;
-			for (i = 0; i < cursor_bit_shift; i++) {
-				p4 = (p4 >> 1) | (p3 << 7);
-				p3 = (p3 >> 1) | (p2 << 7);
-				p2 = (p2 >> 1) | (p1 << 7);
-				p1 = (p1 >> 1) | (p0 << 7);
-				p0 = (p0 >> 1) | (0 << 7);
-			}
-			spr[0] = p0;
-			spr[2] = p1;
-			spr[4] = p2;
-			spr[6] = p3;
-			spr[8] = p4;
+		sprite[0] = p1;
+		sprite[1] = p3;
+		sprite[2] = p0;
+		sprite[3] = p2;
+		sprite[4] = p4;
+		sprite[5] = p5;
 
-			spr += 5 * 2;
-		}
-
-		spr = sprite + 1;
-		for (y = 0; y < CURSOR_HEIGHT; y++) {
-			byte i;
-			byte p0 = *cursor++;
-			byte p1 = *cursor++;
-			byte p2 = *cursor++;
-			byte p3 = *cursor++;
-			byte p4 = 0xFF;
-			for (i = 0; i < cursor_bit_shift; i++) {
-				p4 = (p4 >> 1) | (p3 << 7);
-				p3 = (p3 >> 1) | (p2 << 7);
-				p2 = (p2 >> 1) | (p1 << 7);
-				p1 = (p1 >> 1) | (p0 << 7);
-				p0 = (p0 >> 1) | (1 << 7);
-			}
-			spr[0] = p0;
-			spr[2] = p1;
-			spr[4] = p2;
-			spr[6] = p3;
-			spr[8] = p4;
-			spr += 5 * 2;
-		}
+		sprite += 6;
 	}
 }
 
 /*
 Draw cursor sprite and backup background pixels
+TODO: rename to ShowCursor
 */
-void DrawCursor(byte *target) {
-	last_cursor_draw_ofs = cursor_draw_ofs;
-	CGA_BlitSpriteBak(sprit_load_buffer, CURSOR_WIDTH_SPR / 4, CURSOR_WIDTH_SPR / 4, CURSOR_HEIGHT, target, cursor_draw_ofs, cursor_backup, cursor_color);
+void DrawCursor(void) {
+	UpdateCursor();
+	EGA_DrawCursor();
+	EGA_Flip();
+	UpdateCursor();
+	EGA_DrawCursor();
 }
 
 /*
 Restore background pixels under cursor
+TODO: rename to HideCursor
 */
-void UndrawCursor(byte *target) {
-	CGA_Blit(cursor_backup, CURSOR_WIDTH_SPR / 4, CURSOR_WIDTH_SPR / 4, CURSOR_HEIGHT, target, last_cursor_draw_ofs);
+void UndrawCursor(void) {
+	EGA_UndrawCursorBoth();
 }
 
 /*
 Restore pixels under cursor and update cursor sprite
 */
-void UpdateUndrawCursor(byte *target) {
+void UpdateUndrawCursor(void) {
 	/*TODO: does this call order makes any sense?*/
 	UpdateCursor();
-	UndrawCursor(target);
+	UndrawCursor();
 }

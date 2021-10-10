@@ -1592,9 +1592,9 @@ void DrawSpots(byte *target) {
 			if (DrawZoneAniSprite((rect_t *)spot, (spot - zone_spots) + 1, backbuffer)) {
 				UpdateCursor();
 				WaitVBlank();
-				UndrawCursor(target);
+				UndrawCursor();
 				CGA_CopyScreenBlock(backbuffer, zsprite_w, zsprite_h, target, zsprite_draw_ofs);
-				DrawCursor(target);
+				DrawCursor();
 				CGA_RestoreImage(sprites_list[zone_spr_index - 1], backbuffer);
 				return;
 			}
@@ -1615,24 +1615,20 @@ void AnimateSpots(byte *target) {
 		DrawSpots(target);
 }
 
+void RedrawHintsAndCursor(void) {
+	last_object_hint = object_hint;
+	last_command_hint = command_hint;
+	EGA_DrawCursor();
+	EGA_Flip();
+}
+
 /*
 Draw cursor and hints text on screen
 */
-void DrawHintsAndCursor(byte *target) {
+void DrawHintsAndCursor(void) {
 	UpdateCursor();
-	WaitVBlank();
-	UndrawCursor(target);
-	if (object_hint != last_object_hint) {
-		ShowObjectHint(target);
-		last_object_hint = object_hint;
-	}
-
-	if (command_hint != last_command_hint) {
-		ShowCommandHint(target);
-		last_command_hint = command_hint;
-	}
-
-	DrawCursor(target);
+	EGA_UndrawCursorWork();
+	RedrawHintsAndCursor();
 }
 
 /*
@@ -1714,7 +1710,7 @@ void UpdateProtozorqs(void) {
 
 		if (script_byte_vars.zone_area == script_byte_vars.bvar_3F) {
 			static const animdesc_t anim35 = {ANIMFLG_USESPOT | 35};
-			UpdateUndrawCursor(frontbuffer);
+			UpdateUndrawCursor();
 			RefreshSpritesData();
 			HidePerson(PersonOffset(kPersProtozorq14));
 			HidePerson(PersonOffset(kPersProtozorq5));
@@ -1722,13 +1718,13 @@ void UpdateProtozorqs(void) {
 			HidePerson(PersonOffset(kPersProtozorq13));
 			AnimateSpot(&anim35);
 			BlitSpritesToBackBuffer();
-			DrawCursor(frontbuffer);
+			DrawCursor();
 			return;
 		}
 
 		if (script_byte_vars.zone_area == script_byte_vars.bvar_40) {
 			static const animdesc_t anim34 = {ANIMFLG_USESPOT | 34};
-			UpdateUndrawCursor(frontbuffer);
+			UpdateUndrawCursor();
 			RefreshSpritesData();
 
 			SelectPerson(PersonOffset(kPersProtozorq14));
@@ -1747,7 +1743,7 @@ void UpdateProtozorqs(void) {
 			DrawPersons();
 			CGA_BackBufferToRealFull();
 			BlitSpritesToBackBuffer();
-			DrawCursor(frontbuffer);
+			DrawCursor();
 
 			if (script_byte_vars.zapstiks_owned != 0)
 				script_word_vars.next_protozorqs_cmd = BE(0xC1FD);
@@ -1765,18 +1761,18 @@ void UpdateProtozorqs(void) {
 
 		if (script_byte_vars.zone_area == script_byte_vars.bvar_3F) {
 			static const animdesc_t anim35 = {ANIMFLG_USESPOT | 35};
-			UpdateUndrawCursor(frontbuffer);
+			UpdateUndrawCursor();
 			RefreshSpritesData();
 			HidePerson(PersonOffset(kPersProtozorq14));
 			AnimateSpot(&anim35);
 			BlitSpritesToBackBuffer();
-			DrawCursor(frontbuffer);
+			DrawCursor();
 			return;
 		}
 
 		if (script_byte_vars.zone_area == script_byte_vars.bvar_40) {
 			static const animdesc_t anim34 = {ANIMFLG_USESPOT | 34};
-			UpdateUndrawCursor(frontbuffer);
+			UpdateUndrawCursor();
 			RefreshSpritesData();
 
 			SelectPerson(PersonOffset(kPersProtozorq14));
@@ -1785,7 +1781,7 @@ void UpdateProtozorqs(void) {
 			DrawPersons();
 			CGA_BackBufferToRealFull();
 			BlitSpritesToBackBuffer();
-			DrawCursor(frontbuffer);
+			DrawCursor();
 
 			return;
 		}

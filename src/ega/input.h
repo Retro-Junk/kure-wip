@@ -19,6 +19,7 @@ byte PollKeyboard(void);
 void SetInputButtons(byte keys);
 
 void PollInput(void);
+void PollDiscrete(void);
 void ProcessInput(void);
 void PollInputButtonsOnly(void);
 void ResetInput(void);

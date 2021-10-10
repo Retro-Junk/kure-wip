@@ -3215,7 +3215,7 @@ unsigned int SCR_6A_Unused(void) {
 Open room's items inventory
 */
 unsigned int CMD_1_RoomObjects(void) {
-	UpdateUndrawCursor(CGA_SCREENBUFFER);
+	UpdateUndrawCursor();
 	inv_bgcolor = 0xAA;
 	OpenInventory((0xFF << 8) | ITEMFLG_ROOM, (script_byte_vars.zone_area << 8) | ITEMFLG_ROOM);
 	return ScriptRerun;
@@ -3236,9 +3236,9 @@ unsigned int CMD_2_PsiPowers(void) {
 			command_hint += 109;
 		if (command_hint != last_command_hint)
 			DrawCommandHint();
-		DrawHintsAndCursor(CGA_SCREENBUFFER);
+		DrawHintsAndCursor();
 	} while (buttons == 0);
-	UndrawCursor(CGA_SCREENBUFFER);
+	UndrawCursor();
 	CGA_RestoreBackupImage(CGA_SCREENBUFFER);
 	return ScriptRerun;
 }
@@ -3247,7 +3247,7 @@ unsigned int CMD_2_PsiPowers(void) {
 Open normal inventory box
 */
 unsigned int CMD_3_Posessions(void) {
-	UpdateUndrawCursor(CGA_SCREENBUFFER);
+	UpdateUndrawCursor();
 	inv_bgcolor = 0x55;
 	OpenInventory(ITEMFLG_OWNED, ITEMFLG_OWNED);
 	return ScriptRerun;

@@ -97,9 +97,9 @@ void OpenInventory(uint16 filtermask, uint16 filtervalue) {
 			CheckInventoryItemHover(inv_count);
 			if (command_hint != last_command_hint)
 				DrawCommandHint();
-			DrawHintsAndCursor(frontbuffer);
+			DrawHintsAndCursor();
 		} while (buttons == 0);
-		UndrawCursor(frontbuffer);
+		UndrawCursor();
 	}
 	CGA_RestoreImage(scratch_mem2, frontbuffer);
 	PlaySound(20);

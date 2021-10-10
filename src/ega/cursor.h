@@ -27,8 +27,8 @@ extern byte cursor_anim_phase;
 
 void SelectCursor(unsigned int num);
 void UpdateCursor(void);
-void DrawCursor(byte *target);
-void UndrawCursor(byte *target);
-void UpdateUndrawCursor(byte *target);
+void DrawCursor(void);
+void UndrawCursor(void);
+void UpdateUndrawCursor(void);
 
 #endif

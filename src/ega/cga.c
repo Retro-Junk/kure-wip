@@ -524,27 +524,6 @@ byte *LoadSprite(byte index, byte *bank, byte *buffer, byte header_only) {
 
 extern byte sprit_data[RES_SPRIT_MAX];
 
-byte sprit_load_buffer[1290];
-
-byte *LoadSprit(byte index) {
-	LoadSprite(index, sprit_data + 4, sprit_load_buffer, 0);
-	return sprit_load_buffer;
-}
-
-byte *LoadPersSprit(byte index) {
-#if 0
-	/*Use separate memory for pers1/pers2*/
-	if (index < 61)
-		LoadSprite(index, pers1_data + 4, scratch_mem2, 0);
-	else
-		LoadSprite(index - 61, pers2_data + 4, scratch_mem2, 0);
-#else
-	/*Use single large chunk for pers1+pers2*/
-	LoadSprite(index, perso_data + 4, scratch_mem2, 0);
-#endif
-
-	return scratch_mem2;
-}
 
 
 void DrawSpriteN(byte index, unsigned int x, unsigned int y, byte *target) {

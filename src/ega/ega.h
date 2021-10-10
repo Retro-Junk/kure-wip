@@ -32,6 +32,13 @@
 
 #define EGA_FONT_HEIGHT 6
 
+typedef struct cursor_params_t {
+	uint16	restoffs;
+	uint16	drawoffs;
+	byte	backup[(24 * 16 / EGA_PIXELS_PER_BYTE) * 4];
+} cursor_params_t;
+
+extern cursor_params_t *ega_cursor_params;
 
 extern byte ega_busy;
 
@@ -56,7 +63,9 @@ void EGA_MergePages(byte w, byte h, volatile byte *source, volatile byte *target
 void EGA_MergeScrnToWork(byte w, byte h, uint16 ofs, byte bitofs);
 void EGA_MergeWorkToScrn(byte w, byte h, uint16 ofs, byte bitofs);
 
-byte *EGA_LoadSprite(byte index, byte *bank, byte *buffer, byte header_only);
+
+void EGA_UndrawCursorWork(void);
+void EGA_UndrawCursorBoth(void);
 
 void EGA_DrawVLine(unsigned int x, unsigned int y, unsigned int l, byte color, volatile byte *target);
 void EGA_DrawHLine(unsigned int x, unsigned int y, unsigned int l, byte color, volatile byte *target);
@@ -64,7 +73,31 @@ void EGA_DrawHLine(unsigned int x, unsigned int y, unsigned int l, byte color, v
 void EGA_SetDrawColor(uint16 color);
 void EGA_PrintChar(byte c, volatile byte *target);
 
+extern byte last_sprite_w;
+extern byte last_sprite_h;
+extern uint16 last_sprite_ofs;
+extern byte last_sprite_bitofs;
+
+byte *EGA_LoadSprite(byte index, byte *bank, byte *buffer, byte header_only);
+
+void EGA_ShowSprite(byte index, byte x, byte y, volatile byte *page);
+
+void EGA_ShowSpriteScrn(byte index, byte x, byte y);
+void EGA_ShowSpriteWork(byte index, byte x, byte y);
+
+extern byte last_sprite_w;
+extern byte last_sprite_h;
+extern uint16 last_sprite_ofs;
+extern byte last_sprite_bitofs;
+
+void EGA_BackupAndShowSprite(byte index, byte x, byte y);
+
+byte *EGA_BackupImageScrn(unsigned int ofs, unsigned int bitofs, unsigned int w, unsigned int h);
+void EGA_RestoreBackupImageBoth(void);
 
 
+void EGA_DrawCursor(void);
+void EGA_UndrawCursorWork(void);
+void EGA_UndrawCursorBoth(void);
 
 #endif

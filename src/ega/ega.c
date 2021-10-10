@@ -39,15 +39,9 @@ extern byte *scratch_mem2;
 
 byte ega_busy = 1;
 
-typedef struct cursor_params_t {
-	uint16	restoffs;
-	uint16	drawoffs;
-	byte	backup[(24 * 16 / EGA_PIXELS_PER_BYTE) * 4];
-} cursor_params_t;
-
 cursor_params_t ega_cursor_params_page0;
 cursor_params_t ega_cursor_params_page1;
-cursor_params_t *ega_cursor_params;
+cursor_params_t *ega_cursor_params = &ega_cursor_params_page1;
 
 volatile unsigned char *frontbuffer_scrn = EGA_PAGE0;
 volatile unsigned char *frontbuffer_work = EGA_PAGE1;
@@ -120,6 +114,23 @@ void EGA_SwitchToTextMode(void) {
 	reg.x.ax = 3;
 	int86(0x10, &reg, &reg);
 #endif
+}
+
+
+/*
+Initialize EGA controller to Mode 0
+*/
+void EGA_SetupPorts(void) {
+	outport(0x3CE, 5);		/*set read mode to 0*/
+	outport(0x3CE, 1);		/*disable set/reset for all planes*/
+	outport(0x3CE, 3);		/*disable bit rotate and logic ops*/
+	outport(0x3CE, 0xFF08);	/*set bit mask to FF (use all input bits)*/
+}
+
+void EGA_SetMode2(void) {
+	EGA_SetMapMask(0xF);
+	EGA_SetRegValue(EGA_GC_PORT, 5, 2);	/*set write mode 2*/
+	EGA_SetRegValue(EGA_GC_PORT, 3, 0);	/*disable data rotate/func*/
 }
 
 typedef struct backuphdr_t {
@@ -202,14 +213,92 @@ byte *EGA_BackupImage(byte *buffer, byte *screen, byte w, byte h, uint16 ofs, by
 	return buffer;
 }
 
+byte *EGA_BackupImageScrn(unsigned int ofs, unsigned int bitofs, unsigned int w, unsigned int h) {
+	return EGA_BackupImage(scratch_mem2, frontbuffer_scrn, w, h, ofs, bitofs);
+}
+
 /*
-Initialize EGA controller to Mode 0
+Restore saved image to target screen buffer
 */
-void EGA_SetupPorts(void) {
-	outport(0x3CE, 5);		/*set read mode to 0*/
-	outport(0x3CE, 1);		/*disable set/reset for all planes*/
-	outport(0x3CE, 3);		/*disable bit rotate and logic ops*/
-	outport(0x3CE, 0xFF08);	/*set bit mask to FF (use all input bits)*/
+void EGA_RestoreImage(byte *buffer, volatile byte *page) {
+	int plane, i, j;
+	byte maskl, maskr;
+	unsigned int w, h;
+	uint16 ofs;
+	byte bitofs;
+	backuphdr_t *hdr = (backuphdr_t*)buffer;
+
+	if (!buffer)
+		return 0;
+
+	w = hdr->w;
+	h = hdr->h;
+	ofs = hdr->ofs;
+	bitofs = hdr->bitofs;
+	buffer = &hdr->data;
+
+	ega_busy |= 1;
+	EGA_SetupPorts();
+
+	maskl = 0xFF;
+	if (bitofs != 0x80) {
+		maskl = 0x0F;
+		w++;
+	}
+
+	maskr = 0xFF;
+	if (w % 2) {
+		maskr = 0xF0;
+		w += 2;
+	}
+
+	w /= 2;
+
+	for (plane = 0;plane < 4;plane++) {
+		uint16 o = ofs;
+		EGA_SetMapMask(1 << plane);				/*set write plane mask*/
+		EGA_SetRegValue(EGA_GC_PORT, 4, plane);	/*set read bitplane index*/
+		for (i = 0;i < w;i++) {
+			uint16 oo = ofs;
+			byte mask = 0xFF;
+			if (i == 0)
+				mask = maskl;
+			else if (i == w - 1)
+				mask = maskr;
+
+			for (j = 0;j < h;j++) {
+				byte t = *buffer++;
+				page[ofs] &= ~mask;
+				page[ofs] |= t & mask;
+				ofs += EGA_BYTES_PER_LINE;
+			}
+			ofs = oo + 1;
+		}
+		ofs = o;
+	}
+
+	ega_busy &= ~1;
+	return;
+}
+
+void EGA_RestoreImageScrn(byte *buffer) {
+	EGA_RestoreImage(buffer, frontbuffer_scrn);
+}
+
+void EGA_RestoreImageWork(byte *buffer) {
+	EGA_RestoreImage(buffer, frontbuffer_work);
+}
+
+/*
+Restore saved image from scratch mem to target screen buffer
+*/
+void EGA_RestoreBackupImage(volatile byte *page) {
+	EGA_RestoreImage(scratch_mem2, page);
+}
+
+void EGA_RestoreBackupImageBoth(void) {
+	EGA_RestoreImageWork(scratch_mem2);
+	EGA_RestoreImageScrn(scratch_mem2);
 }
 
 /*
@@ -366,12 +455,6 @@ void EGA_RefreshImageData(byte *buffer) {
 	/*CGA_CopyScreenBlock(CGA_SCREENBUFFER, w, h, backbuffer, ofs);*/
 }
 
-void EGA_SetMode2(void) {
-	EGA_SetMapMask(0xF);
-	EGA_SetRegValue(EGA_GC_PORT, 5, 2);	/*set write mode 2*/
-	EGA_SetRegValue(EGA_GC_PORT, 3, 0);	/*disable data rotate/func*/
-}
-
 void EGA_DrawCursor(void) {
 	byte t;
 	uint16 x, y, o;
@@ -410,7 +493,7 @@ void EGA_UndrawCursorWork(void) {
 /*
 Restore pixels under cursor in all buffer
 */
-void EGA_UndrawCursorShow(void) {
+void EGA_UndrawCursorBoth(void) {
 	EGA_UndrawCursorWork();
 	EGA_Flip();
 	EGA_UndrawCursorWork();
@@ -444,6 +527,19 @@ byte *EGA_LoadSprite(byte index, byte *bank, byte *buffer, byte header_only) {
 		}
 	}
 	return buffer;
+}
+
+byte sprit_load_buffer[1290];
+
+byte *LoadSprit(byte index) {
+	EGA_LoadSprite(index, sprit_data + 4, sprit_load_buffer, 0);
+	return sprit_load_buffer;
+}
+
+byte *LoadPersSprit(byte index) {
+	/*Use single large chunk for pers1+pers2*/
+	EGA_LoadSprite(index, perso_data + 4, scratch_mem2, 0);
+	return scratch_mem2;
 }
 
 /*
@@ -606,4 +702,66 @@ void EGA_MergeScrnToWork(byte w, byte h, uint16 ofs, byte bitofs) {
 
 void EGA_MergeWorkToScrn(byte w, byte h, uint16 ofs, byte bitofs) {
 	EGA_MergePages(w, h, frontbuffer_work, frontbuffer_scrn, ofs, bitofs);
+}
+
+void EGA_BlitSpriteData(byte *sprdata, byte rw, byte w, byte h, volatile byte *page, uint16 ofs, byte bitofs) {
+	int x, y;
+	ega_busy |= 1;
+	EGA_SetMode2();
+	for (x = 0;x < w * 4;x++) {
+		uint16 o = ofs;
+		byte *spr = sprdata;
+		EGA_SetRegValue(EGA_GC_PORT, 8, bitofs);	/*select write plane*/
+		for (y = 0;y < h;y++) {
+			byte pix = *spr;
+			spr += rw;
+			if (pix != 0) {
+				byte t = page[o];	/*latch*/
+				page[o] = pix;
+			}
+			o += EGA_BYTES_PER_LINE;
+		}
+		sprdata++;
+
+		bitofs >>= 1;
+		/*all byte's pixels done?*/
+		if (bitofs == 0) {
+			ofs++;
+			bitofs = 0x80;
+		}
+	}
+	ega_busy &= ~1;
+}
+
+byte last_sprite_w;
+byte last_sprite_h;
+uint16 last_sprite_ofs;
+byte last_sprite_bitofs;
+
+void EGA_ShowSprite(byte index, byte x, byte y, volatile byte *page) {
+	byte w, h;
+	unsigned int ofs;
+	byte bitofs;
+	byte *sprite = LoadSprit(index);
+	ofs = EGA_CalcXY_p(x, y, &bitofs);
+	w = sprite[0];
+	h = sprite[1];
+	EGA_BlitSpriteData(sprite + 2, w * 4, w, h, page, ofs, bitofs);
+	last_sprite_w = w;
+	last_sprite_h = h;
+	last_sprite_ofs = ofs;
+	last_sprite_bitofs = bitofs;
+}
+
+void EGA_ShowSpriteScrn(byte index, byte x, byte y) {
+	EGA_ShowSprite(index, x, y, frontbuffer_scrn);
+}
+
+void EGA_ShowSpriteWork(byte index, byte x, byte y) {
+	EGA_ShowSprite(index, x, y, frontbuffer_work);
+}
+
+void EGA_BackupAndShowSprite(byte index, byte x, byte y) {
+	EGA_ShowSprite(index, x, y, frontbuffer_work);
+	EGA_BackupImageScrn(last_sprite_ofs, last_sprite_bitofs, last_sprite_w, last_sprite_h);
 }

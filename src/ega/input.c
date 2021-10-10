@@ -172,8 +172,7 @@ void PollInput(void) {
 
 void ProcessInput(void) {
 	PollInput();
-	UpdateCursor();
-	DrawCursor(frontbuffer);
+	DrawCursor();
 }
 
 void ResetInput(void) {

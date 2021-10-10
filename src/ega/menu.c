@@ -1,6 +1,7 @@
 #include "common.h"
 #include "menu.h"
 #include "cga.h"
+#include "ega.h"
 #include "input.h"
 #include "cursor.h"
 #include "room.h"
@@ -68,6 +69,8 @@ void ActionsMenu(byte **pinfo) {
 	byte choices;
 	int i, choice, numchoices;
 	byte *menurecs;
+	uint16 draw_ofs;
+	byte draw_bitofs, draw_w, draw_h;
 
 	last_object_hint = object_hint;
 
@@ -90,8 +93,11 @@ void ActionsMenu(byte **pinfo) {
 	y = act_menu_y;
 
 	/*menu sprite*/
-	BackupAndShowSprite(0, x, y);
-	PlaySound(18);
+	EGA_BackupAndShowSprite(0, x, y);
+	draw_ofs = last_sprite_ofs;
+	draw_bitofs = last_sprite_bitofs;
+	draw_w = last_sprite_w;
+	draw_h = last_sprite_h;
 
 	choices = *((*pinfo)++);
 	menurecs = *pinfo;
@@ -112,7 +118,10 @@ void ActionsMenu(byte **pinfo) {
 	act_dot_rects_end = act_dot_rects + numchoices + 1;
 
 	for (i = 0; i < numchoices; i++)
-		DrawSpriteN(1, act_dot_rects[i].sx, act_dot_rects[i].sy, CGA_SCREENBUFFER);
+		EGA_ShowSpriteWork(1, act_dot_rects[i].sx, act_dot_rects[i].sy);
+
+	PlaySound(18);
+	EGA_MergeWorkToScrn(draw_w, draw_h, draw_ofs, draw_bitofs);
 
 	SelectCursor(CURSOR_FINGER);
 	ProcessInput();
@@ -138,23 +147,23 @@ void ActionsMenu(byte **pinfo) {
 
 		if (command_hint != last_command_hint)
 			DrawCommandHint();  /*to backbuffer*/
-		DrawHintsAndCursor(CGA_SCREENBUFFER);
+		DrawHintsAndCursor();
 	} while (buttons == 0);
-	UndrawCursor(CGA_SCREENBUFFER);
+	EGA_UndrawCursorBoth();
 
 	if (the_command != 0xFFFF) {
 		PlaySound(19);
-		WaitVBlank();
+		EGA_WaitVBlank();
 
 		/*draw dot explosion animation*/
-		DrawSpriteN(24, act_dot_rects[choice].sx, act_dot_rects[choice].sy, CGA_SCREENBUFFER);
+		EGA_ShowSpriteScrn(24, act_dot_rects[choice].sx, act_dot_rects[choice].sy);
 		for (i = 0; i < 0xFFF; i++) ; /*TODO: weak delay*/
-		DrawSpriteN(2, act_dot_rects[choice].sx, act_dot_rects[choice].sy, CGA_SCREENBUFFER);
+		EGA_ShowSpriteScrn(2, act_dot_rects[choice].sx, act_dot_rects[choice].sy);
 		for (i = 0; i < 0xFFF; i++) ; /*TODO: weak delay*/
-		DrawSpriteN(25, act_dot_rects[choice].sx, act_dot_rects[choice].sy, CGA_SCREENBUFFER);
+		EGA_ShowSpriteScrn(25, act_dot_rects[choice].sx, act_dot_rects[choice].sy);
 		for (i = 0; i < 0xFFF; i++) ; /*TODO: weak delay*/
 	}
-	CGA_RestoreBackupImage(CGA_SCREENBUFFER);
+	EGA_RestoreBackupImageBoth();
 
 	*pinfo += numchoices * 3;
 }
@@ -167,9 +176,9 @@ void MenuLoop(byte spotmask, byte spotvalue) {
 		CheckHotspots(spotmask, spotvalue);
 		if (object_hint != last_object_hint)
 			DrawObjectHint();
-		DrawHintsAndCursor(frontbuffer);
+		DrawHintsAndCursor();
 	} while (buttons == 0);
-	UndrawCursor(frontbuffer);
+	UndrawCursor();
 }
 
 void ProcessMenu(void) {

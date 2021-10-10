@@ -148,7 +148,8 @@ void ShowCommandHint(byte *target);
 void DrawCharacterSprite(byte spridx, byte x, byte y, byte *target);
 char DrawZoneAniSprite(rect_t *rect, unsigned int index, byte *target);
 
-void DrawHintsAndCursor(byte *target);
+void RedrawHintsAndCursor(void);
+void DrawHintsAndCursor(void);
 
 void DrawTheWallDoors(void);
 void MergeSpritesData(byte *target, unsigned int pitch, byte *source, unsigned int w, unsigned int h);
